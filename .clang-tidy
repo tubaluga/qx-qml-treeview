@@ -1,0 +1,22 @@
+---
+Checks                : "\
+                        -*, \
+                        bugprone-*, \
+                        cppcoreguidelines-*, \
+                        -cppcoreguidelines-avoid-magic-numbers, \
+                        -cppcoreguidelines-owning-memory, \
+                        -cppcoreguidelines-pro-bounds-array-to-pointer-decay, \
+                        clang-*, \
+                        misc-*, \
+                        modernize-*, \
+                        performance-*, \
+                        portability-*, \
+                        readability-*, \
+                        -readability-magic-numbers, \
+                        -readability-named-parameter, \
+                        -readability-uppercase-literal-suffix \
+                        "
+WarningsAsErrors      : ''
+HeaderFilterRegex     : ''
+AnalyzeTemporaryDtors : false
+FormatStyle           : file

@@ -1,0 +1,3 @@
+module		Qx.treeview
+plugin		qx-qml-treeview-quickplugin
+classname	QxTreeViewPlugin
