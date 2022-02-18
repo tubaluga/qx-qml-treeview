@@ -11,7 +11,7 @@ int main(int argc, char **argv)
     application.setApplicationVersion("1.0.0");
 
     QQmlApplicationEngine *engine = new QQmlApplicationEngine;
-    engine->load(QUrl(QLatin1String("qrc:/qml/ApplicationWindow.qml")));
+    engine->load(QUrl(QLatin1String("qrc:/qml/main.qml")));
 
     return application.exec();
 }
