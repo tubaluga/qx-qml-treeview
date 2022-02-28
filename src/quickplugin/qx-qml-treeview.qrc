@@ -1,5 +1,9 @@
 <RCC>
     <qresource prefix="/">
-        <file>qx-qml-treeview/TreeView.qml</file>
+        <file>qx-qml-treeview/QxTreeView.qml</file>
+        <file>media/arrow_right_black_24dp.svg</file>
+        <file>qx-qml-treeview/QxTreeViewCellDelegate.qml</file>
+        <file>qx-qml-treeview/QxTreeViewRowDelegate.qml</file>
+        <file>qx-qml-treeview/QxHorizontalHeaderView.qml</file>
     </qresource>
 </RCC>

@@ -58,6 +58,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 		Qt5::Core
 		Qt5::Qml
 		Qt5::Quick		
+		Qt5::QuickPrivate
 	)
 
 set(MODULE_DIR share/imports/Qx/treeview/)

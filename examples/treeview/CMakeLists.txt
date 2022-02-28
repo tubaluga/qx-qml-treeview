@@ -1,6 +1,6 @@
 project(treeview-example VERSION 1.0.0 LANGUAGES CXX)
 
-find_package(Qt5 REQUIRED COMPONENTS Core Qml Quick)
+find_package(Qt5 REQUIRED COMPONENTS Core Qml Quick Widgets)
 
 if (WIN32)
     set(APPLICATION_TYPE WIN32)
@@ -12,6 +12,8 @@ set(QML_IMPORT_PATH ${OUTPUT_DIR})
 
 add_executable(${PROJECT_NAME} ${APPLICATION_TYPE}
     src/main.cpp
+	src/exampletreeitemmodel.h
+	src/exampletreeitemmodel.cpp
     app.qrc
 )
 
@@ -29,6 +31,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     Qt5::Core
     Qt5::Qml
     Qt5::Quick
+	Qt5::Widgets	
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE 

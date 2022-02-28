@@ -1,3 +1,6 @@
 module		Qx.treeview
 plugin		qx-qml-treeview-quickplugin
 classname	QxTreeViewPlugin
+
+depends		QtQuick.Controls 1.4
+depends		QtQuick.Controls 2.0
