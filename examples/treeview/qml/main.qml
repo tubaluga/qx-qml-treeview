@@ -46,19 +46,19 @@ ApplicationWindow {
                     QxHeaderSection { title: qsTr("First") },
                     QxHeaderSection { title: qsTr("Second") }
                 ]
-            },
+            }/*,
             QxHeaderSection {
                 title: qsTr("General 1")
 
-                /*sections: [
+                sections: [
                     QxHeaderSection { title: qsTr("1") },
                     QxHeaderSection { title: qsTr("2") },
                     QxHeaderSection { title: qsTr("3") }
-                ]*/
+                ]
             },
             QxHeaderSection {
                 title: qsTr("General 2")
-            }
+            }*/
         ]
     }
 

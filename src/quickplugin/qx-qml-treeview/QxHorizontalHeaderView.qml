@@ -74,7 +74,7 @@ QxHorizontalHeaderViewTemplate {
     }*/
 
     GridLayout {
-        rows: 3
+        rows: 4
         columns: 10
 
         Repeater {
@@ -85,45 +85,56 @@ QxHorizontalHeaderViewTemplate {
                 implicitWidth: text_view.implicitWidth
                 implicitHeight: text_view.implicitHeight
 
+                Layout.row: adaptor_section.row
+                Layout.column: adaptor_section.column
+                Layout.columnSpan: adaptor_section.columnSpan
+                Layout.rowSpan: adaptor_section.rowSpan
+                Layout.fillWidth: true
+                Layout.alignment: Qt.AlignHCenter | Qt.AlignLeft
+
                 Text {
                     id: text_view
+                    width: parent.width
+                    elide: Text.ElideRight
 
-                    text: adaptor_title
-                    Layout.row: adaptor_section.row
-                    Layout.column: adaptor_section.column
-                    Layout.columnSpan: adaptor_section.columnSpan
-                    Layout.rowSpan: adaptor_section.rowSpan
+                    text: '%1 %2 %3 %4 %5'.arg(adaptor_title)
+                    .arg(adaptor_section.row)
+                    .arg(adaptor_section.column)
+                    .arg(adaptor_section.columnSpan)
+                    .arg(adaptor_section.rowSpan)
 
-                    padding: 8
 
-                    Rectangle {
-                        anchors.fill: parent
+                    padding: 8                                   
+                }
 
-                        color: 'transparent'
-                        border.width: 1
-                        border.color: 'black'
+                Rectangle {
+                    anchors.fill: parent
+
+                    color: 'transparent'
+                    border.width: 1
+                    border.color: 'black'
+                }
+
+                MouseArea {
+                    property int offset: 0
+                    readonly property int minimumSize: 20
+
+                    width: 16
+                    height: parent.height
+                    anchors.right: parent.right
+                    anchors.rightMargin: -width / 2
+                    cursorShape: Qt.SizeHorCursor
+                    preventStealing: true
+
+                    onPositionChanged: {
+                        var newHeaderWidth = delegate_item.width + (mouseX - offset)
+                        console.log(newHeaderWidth)
+                        delegate_item.implicitWidth = Math.max(minimumSize, newHeaderWidth)
+                        //headerView.setSectionWidth(index, Math.max(minimumSize, newHeaderWidth))
+
                     }
 
-                    MouseArea {
-                        property int offset: 0
-                        readonly property int minimumSize: 20
-
-                        width: 16
-                        height: parent.height
-                        anchors.right: parent.right
-                        anchors.rightMargin: -width / 2
-                        cursorShape: Qt.SizeHorCursor
-                        preventStealing: true
-
-                        onPositionChanged: {
-                            var newHeaderWidth = delegate_item.width + (mouseX - offset)
-                            delegate_item.implicitWidth = Math.max(minimumSize, newHeaderWidth)
-                            //headerView.setSectionWidth(index, Math.max(minimumSize, newHeaderWidth))
-
-                        }
-
-                        onPressedChanged: if (pressed) offset=mouseX
-                    }
+                    onPressedChanged: if (pressed) offset=mouseX
                 }
             }
         }
