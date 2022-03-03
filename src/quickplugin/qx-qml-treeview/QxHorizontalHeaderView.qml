@@ -6,113 +6,52 @@ import Qx.treeview 1.0
 QxHorizontalHeaderViewTemplate {
     id: control
 
-    /* property Component delegate: Text {
-        anchors.fill: parent
-        verticalAlignment: Qt.AlignVCenter
-        horizontalAlignment: Qt.AlignHCenter
+    property Component delegate
+    property Component handleDelegate
 
-        wrapMode: Text.Wrap
-
-        text: sectionModelData.text
-    }
-
-    property Component dragHandleDelegate: Item {
-        Rectangle {
-            x: parent.width - 1
-            width: 2
-            height: parent.height
-
-            color: '#040404'
-        }
-    }
-
-    sectionDelegate: Item {
-        id: delegate
-
-        implicitHeight: content_loader.implicitHeight
-        implicitWidth: content_loader.implicitWidth
-
-        Rectangle {
-            anchors.fill: parent
-            color: 'orange'
-
-        }
-
-        Loader {
-            id: content_loader
-            anchors.fill: parent
-
-            property QtObject sectionModelData: sectionData
-
-            sourceComponent: control.delegate
-        }
-
-        Loader {
-            anchors.fill: parent
-            sourceComponent: control.dragHandleDelegate
-        }
-
-        MouseArea {
-            property int offset: 0
-            readonly property int minimumSize: 20
-
-            width: 16
-            height: parent.height
-            anchors.right: parent.right
-            anchors.rightMargin: -width / 2
-            cursorShape: Qt.SizeHorCursor
-            preventStealing: true
-
-            onPositionChanged: {
-                var newHeaderWidth = headerView.sectionWidth(index) + (mouseX - offset)
-                headerView.setSectionWidth(index, Math.max(minimumSize, newHeaderWidth))
-
-            }
-
-            onPressedChanged: if (pressed) offset=mouseX
-        }
-    }*/
+    implicitHeight: grid_layout.implicitHeight
+    implicitWidth: grid_layout.implicitWidth
 
     GridLayout {
-        rows: 4
-        columns: 10
+        id: grid_layout
+        rows: control.rowCount
+        columns: control.columnCount
+
+        columnSpacing: -1
+        rowSpacing: -1
 
         Repeater {
+            id: repeater
             model: control.adaptor
             delegate: Item {
                 id: delegate_item
 
-                implicitWidth: text_view.implicitWidth
-                implicitHeight: text_view.implicitHeight
+                implicitWidth: adaptor_section.width
+                implicitHeight: delegate_loader.implicitHeight
 
                 Layout.row: adaptor_section.row
                 Layout.column: adaptor_section.column
                 Layout.columnSpan: adaptor_section.columnSpan
                 Layout.rowSpan: adaptor_section.rowSpan
                 Layout.fillWidth: true
-                Layout.alignment: Qt.AlignHCenter | Qt.AlignLeft
+                Layout.fillHeight: true
 
-                Text {
-                    id: text_view
-                    width: parent.width
-                    elide: Text.ElideRight
-
-                    text: '%1 %2 %3 %4 %5'.arg(adaptor_title)
-                    .arg(adaptor_section.row)
-                    .arg(adaptor_section.column)
-                    .arg(adaptor_section.columnSpan)
-                    .arg(adaptor_section.rowSpan)
-
-
-                    padding: 8                                   
-                }
-
-                Rectangle {
+                Loader {
+                    id: delegate_loader
                     anchors.fill: parent
+                    sourceComponent: control.delegate
 
-                    color: 'transparent'
-                    border.width: 1
-                    border.color: 'black'
+                    property QtObject sectionData: QtObject {
+                        property string title: adaptor_title
+                        readonly property int row: adaptor_section.row
+                        readonly property int column: adaptor_section.column
+                    }
+
+                    onLoaded: {
+                        if (adaptor_section.width === -1) {
+                            adaptor_section.width = delegate_loader.item.implicitWidth
+                        }
+                    }
                 }
 
                 MouseArea {
@@ -126,22 +65,15 @@ QxHorizontalHeaderViewTemplate {
                     cursorShape: Qt.SizeHorCursor
                     preventStealing: true
 
-                    onPositionChanged: {
-                        var newHeaderWidth = delegate_item.width + (mouseX - offset)
-                        console.log(newHeaderWidth)
-                        delegate_item.implicitWidth = Math.max(minimumSize, newHeaderWidth)
-                        //headerView.setSectionWidth(index, Math.max(minimumSize, newHeaderWidth))
-
-                    }
-
+                    onPositionChanged: control.adaptor.addSectionWidthOffset(adaptor_section, (mouseX - offset))
                     onPressedChanged: if (pressed) offset=mouseX
+
+                    Loader {
+                        anchors.fill: parent
+                        sourceComponent: control.handleDelegate
+                    }
                 }
             }
-        }
-
-        Component.onCompleted: {
-            console.log("ready")
-            //control.adaptor.invalidate()
         }
     }
 }

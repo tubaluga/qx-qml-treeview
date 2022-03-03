@@ -76,6 +76,9 @@ QVariant QxHeaderModelAdaptor::data(const QModelIndex &index, int role) const
     else if (role == HeaderSection) {
         return QVariant::fromValue(section);
     }
+    else if (role == IsLeaf) {
+        return section->isLeaf();
+    }
 
     return QVariant();
 }
@@ -90,6 +93,7 @@ QHash<int, QByteArray> QxHeaderModelAdaptor::roleNames() const
     roles.insert(Role::Row, "adaptor_row");
     roles.insert(Role::Column, "adaptor_column");
     roles.insert(Role::HeaderSection, "adaptor_section");
+    roles.insert(Role::IsLeaf, "adaptor_is_leaf");
 
     return roles;
 }
@@ -108,8 +112,6 @@ int QxHeaderModelAdaptor::sectionColumn(QxHeaderSection *section) const
     int column = 0;
     bool find  = false;
 
-    qDebug() << "depth" << depth;
-
     std::function<void(QxHeaderSection * section)> tree_visitor = [&tree_visitor, depth, &column, section, &find](QxHeaderSection *v_section) {
         if (find) {
             return;
@@ -122,9 +124,6 @@ int QxHeaderModelAdaptor::sectionColumn(QxHeaderSection *section) const
 
         if (v_section->depth() == depth) {
             ++column;
-
-            qDebug() << column << v_section->title() << v_section->depth() << section->title() << section->depth();
-
             return;
         }
 
@@ -149,4 +148,35 @@ void QxHeaderModelAdaptor::setRoot(QxHeaderSection *newRoot)
     m_root = newRoot;
 
     setSections(m_root->sections());
+}
+
+void QxHeaderModelAdaptor::addSectionWidthOffset(QxHeaderSection *section, int offset)
+{
+    if (section == nullptr) {
+        return;
+    }
+
+    auto parent_section = section->parentSection();
+
+    while (parent_section) {
+        parent_section->setWidth(qMax(20, parent_section->width() + offset));
+        parent_section = parent_section->parentSection();
+    }
+
+    section->setWidth(section->width() + offset);
+
+    if (!section->sections().isEmpty()) {
+        auto child_section = section->sections().last();
+
+        while (child_section != nullptr) {
+            child_section->setWidth(qMax(20, child_section->width() + offset));
+
+            if (!child_section->sections().isEmpty()) {
+                child_section = child_section->sections().last();
+            }
+            else {
+                break;
+            }
+        }
+    }
 }

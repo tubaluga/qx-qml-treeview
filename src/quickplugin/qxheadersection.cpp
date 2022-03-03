@@ -15,8 +15,7 @@ void QxHeaderSection::appendSection(QxHeaderSection *section)
     section->setParentSection(this);
     m_sections.append(section);
 
-    /*invalidate();
-    section->invalidate();*/
+    section->invalidate();
 }
 
 int QxHeaderSection::sectionCount()
@@ -122,6 +121,21 @@ void QxHeaderSection::resize()
     setWidth(new_size);
 }
 
+QxHeaderSection *QxHeaderSection::findFirstLeafSection()
+{
+    if (sections().isEmpty()) {
+        return this;
+    }
+
+    auto section = sections().first();
+
+    while (!section->isLeaf()) {
+        section = section->sections().first();
+    }
+
+    return section;
+}
+
 void QxHeaderSection::invalidate()
 {
     if (isLeaf()) {
@@ -131,30 +145,37 @@ void QxHeaderSection::invalidate()
         setColumnSpan(leafCount());
     }
 
-    qDebug() << "depth" << depth();
-
     setRow(qMax(depth() - 1, 0));
 
     if (parentSection() != nullptr) {
         auto root = rootSection();
 
-        int col = 0;
+        int column_index = -1;
 
         if (isLeaf()) {
-            col = root->leafs().indexOf(this);
+            column_index = root->leafs().indexOf(this);
         }
         else {
-            col = leafs().indexOf(root->leafs().at(0));
+            auto leaf_section = findFirstLeafSection();
+
+            column_index = root->leafs().indexOf(leaf_section);
         }
 
-        setColumn(col);
+        setColumn(column_index);
     }
     else {
         setColumn(0);
         setRow(0);
     }
 
-    qDebug() << "INVALIDATE" << this << title() << row() << column() << "span" << columnSpan() << rowSpan();
+    if (children().empty()) {
+        int current_depth = depth();
+        int max_depth     = rootSection()->maxChildrenDepth();
+
+        if (current_depth < max_depth) {
+            setRowSpan(max_depth - current_depth);
+        }
+    }
 }
 
 QxHeaderSection *QxHeaderSection::parentSection() const
@@ -217,6 +238,23 @@ int QxHeaderSection::depth() const
     return depth;
 }
 
+int QxHeaderSection::maxChildrenDepth() const
+{
+    std::function<void(const QxHeaderSection *, int &)> tree_visitor = [&tree_visitor](const QxHeaderSection *section, int &depth) {
+        ++depth;
+
+        for (int i = 0; i < section->sections().size(); ++i) {
+            auto s = section->sections().at(i);
+            tree_visitor(s, depth);
+        }
+    };
+
+    int res = 0;
+    tree_visitor(this, res);
+
+    return res;
+}
+
 QList<QxHeaderSection *> QxHeaderSection::leafs() const
 {
     QList<QxHeaderSection *> result;
@@ -237,6 +275,27 @@ QList<QxHeaderSection *> QxHeaderSection::leafs() const
     tree_visitor(m_sections);
 
     return result;
+}
+
+QList<QxHeaderSection *> QxHeaderSection::depthSections(int depth) const
+{
+    QList<QxHeaderSection *> res;
+    std::function<void(const QList<QxHeaderSection *> &, QList<QxHeaderSection *> &)> tree_visitor = [&tree_visitor, depth](const QList<QxHeaderSection *> &sections, QList<QxHeaderSection *> &container) {
+        for (int i = 0; i < sections.size(); ++i) {
+            auto s = sections.at(i);
+
+            if (s->depth() == depth) {
+                container << s;
+            }
+            else {
+                tree_visitor(s->sections(), container);
+            }
+        }
+    };
+
+    tree_visitor(m_sections, res);
+
+    return res;
 }
 
 const QString &QxHeaderSection::title() const

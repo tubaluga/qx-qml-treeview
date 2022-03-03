@@ -2,11 +2,16 @@
 
 #include <QQmlContext>
 #include <QQmlEngine>
+#include <QTimer>
 
 QxHeaderViewTemplate::QxHeaderViewTemplate(QQuickItem *parent) :
     QQuickItem(parent)
 {
     m_rootSection = new QxHeaderSection(this);
+}
+
+QxHeaderViewTemplate::~QxHeaderViewTemplate()
+{
 }
 
 QAbstractItemModel *QxHeaderViewTemplate::model() const
@@ -25,8 +30,6 @@ void QxHeaderViewTemplate::setModel(QAbstractItemModel *newModel)
     m_model = newModel;
 
     setupModel(m_model.data(), old_model);
-
-    invalidate();
 
     emit modelChanged();
 }
@@ -108,7 +111,6 @@ QQmlListProperty<QxHeaderSection> QxHeaderViewTemplate::sectionListProperty()
 void QxHeaderViewTemplate::appendSection(QxHeaderSection *section)
 {
     m_sections.append(section);
-
     invalidate();
 }
 

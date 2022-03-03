@@ -21,7 +21,8 @@ public:
         ColSpan       = Qt::UserRole + 2,
         Column        = Qt::UserRole + 3,
         Row           = Qt::UserRole + 4,
-        HeaderSection = Qt::UserRole + 5
+        HeaderSection = Qt::UserRole + 5,
+        IsLeaf        = Qt::UserRole + 6
     };
 
     Q_ENUM(Role)
@@ -37,13 +38,13 @@ public:
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
     QHash<int, QByteArray> roleNames() const override;
 
-    Q_INVOKABLE void invalidate();
-
     QxHeaderSection *root() const;
     void setRoot(QxHeaderSection *newRoot);
 
+    Q_INVOKABLE void addSectionWidthOffset(QxHeaderSection *section, int offset);
+
 protected:
-    void rebuildModel();
+    void invalidate();
     int sectionColumn(QxHeaderSection *section) const;
 
 signals:

@@ -17,6 +17,7 @@ class QxHeaderViewTemplate : public QQuickItem {
 
 public:
     explicit QxHeaderViewTemplate(QQuickItem *parent = nullptr);
+    virtual ~QxHeaderViewTemplate();
 
     QAbstractItemModel *model() const;
     void setModel(QAbstractItemModel *newModel);

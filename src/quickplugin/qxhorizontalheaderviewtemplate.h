@@ -15,24 +15,29 @@ class QxHorizontalHeaderViewTemplate : public QxHeaderViewTemplate {
     Q_DECLARE_PRIVATE(QxHorizontalHeaderViewTemplate)
 
     Q_PROPERTY(QxHeaderModelAdaptor *adaptor READ adaptor CONSTANT)
+    Q_PROPERTY(int rowCount READ rowCount NOTIFY rowCountChanged)
+    Q_PROPERTY(int columnCount READ columnCount NOTIFY columnCountChanged)
 
     Q_INTERFACES(QQmlParserStatus)
 public:
     explicit QxHorizontalHeaderViewTemplate(QQuickItem *parent = nullptr);
-
-    void componentComplete() override;
+    ~QxHorizontalHeaderViewTemplate();
 
     QxHeaderModelAdaptor *adaptor() const;
 
+    int rowCount() const;
+    int columnCount() const;
+
+signals:
+    void rowCountChanged();
+    void columnCountChanged();
+
 protected:
     void invalidate() override;
-    /*void invalidateHeaderRowHeigh(int row);
-    void invalidateHeaderHeight();
-    void headerDataChanged(Qt::Orientation orientation, int first, int last);
-    void createTreeHeaderSection(int &position, const QModelIndex &index, Section *parent_section = nullptr);*/
+    void setupModel(QAbstractItemModel *new_model, QAbstractItemModel *old_model);
+    void setRowCount(int newRowCount);
+    void setColumnCount(int newColumnCount);
 
 private:
-    QxHeaderModelAdaptor *m_adaptor = nullptr;
     QxHorizontalHeaderViewTemplatePrivate *d_ptr;
-    bool m_treeMode = true;
 };

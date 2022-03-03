@@ -7,7 +7,7 @@ class QxHeaderSection : public QObject {
     Q_OBJECT
 
     Q_PROPERTY(QString title READ title WRITE setTitle NOTIFY titleChanged)
-    Q_PROPERTY(int m_width READ width WRITE setWidth NOTIFY widthChanged)
+    Q_PROPERTY(int width READ width WRITE setWidth NOTIFY widthChanged)
     Q_PROPERTY(int rowSpan READ rowSpan WRITE setRowSpan NOTIFY rowSpanChanged)
     Q_PROPERTY(int columnSpan READ columnSpan WRITE setColumnSpan NOTIFY columnSpanChanged)
     Q_PROPERTY(QQmlListProperty<QxHeaderSection> sections READ sectionListProperty CONSTANT)
@@ -31,8 +31,10 @@ public:
     bool isLeaf() const;
     int leafCount() const;
     int depth() const;
+    int maxChildrenDepth() const;
 
     QList<QxHeaderSection *> leafs() const;
+    QList<QxHeaderSection *> depthSections(int depth) const;
 
     QxHeaderSection *parentSection() const;
     void setParentSection(QxHeaderSection *newSectionParent);
@@ -57,6 +59,7 @@ public:
 
 protected:
     void resize();
+    QxHeaderSection *findFirstLeafSection();
 
 signals:
     void titleChanged();
@@ -74,7 +77,7 @@ private:
 
 private:
     QString m_title;
-    int m_width                      = 100;
+    int m_width                      = -1;
     int m_column                     = 0;
     int m_row                        = 0;
     int m_rowSpan                    = 1;
