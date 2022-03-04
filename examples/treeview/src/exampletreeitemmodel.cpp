@@ -59,7 +59,7 @@ int TreeItemModel::rowCount(const QModelIndex &parent) const
 
 int TreeItemModel::columnCount(const QModelIndex &parent) const
 {
-    return 3;
+    return 2;
 }
 
 QHash<int, QByteArray> TreeItemModel::roleNames() const

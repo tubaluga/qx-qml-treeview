@@ -126,6 +126,10 @@ QxHeaderSection *QxHeaderViewTemplate::section(int index)
 
 void QxHeaderViewTemplate::clearSections()
 {
+    foreach (auto sec, m_sections) {
+        sec->deleteLater();
+    }
+
     m_sections.clear();
 }
 

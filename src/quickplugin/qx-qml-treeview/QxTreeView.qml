@@ -25,7 +25,7 @@ QxTreeViewTemplate {
             view: root
         }
 
-        header: QxHorizontalHeaderView {
+        /*header: QxHorizontalHeaderView {
             model: root.model
             width: ListView.view.width
             height: 40
@@ -55,6 +55,6 @@ QxTreeViewTemplate {
                 }
             }
 
-        }
+        }*/
     }
 }

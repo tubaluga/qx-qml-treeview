@@ -19,4 +19,5 @@ void QxTreeViewPlugin::registerTypes(const char *uri)
     qmlRegisterUncreatableType<QxTreeViewSectionModelData>(uri, 1, 0, "QxTreeViewSectionModelData", "This is the inner data class");
     qmlRegisterType<QxHeaderSection>(uri, 1, 0, "QxHeaderSection");
     qmlRegisterType<QxHeaderModelAdaptor>(uri, 1, 0, "QxHeaderModelAdaptor");
+    qmlRegisterUncreatableType<QAbstractItemModel>(uri, 1, 0, "QAbstractItemModel", "");
 }

@@ -12,9 +12,42 @@ ApplicationWindow {
     title: Qt.application.displayName
     visible: true
 
+    Component {
+        id: header_delegate_component
+
+        Control {
+            background:  Item {
+                Rectangle {
+                    height: 1
+                    width: parent.width
+                    y: parent.height-1
+                    color: 'black'
+                }
+            }
+            contentItem: Text {
+                padding: 8
+                text: sectionData.title
+                elide: Text.ElideRight
+            }
+        }
+    }
+
+    Component {
+        id: handle_delegate_component
+        Item {
+            Rectangle {
+                width: 1
+                height: parent.height
+                anchors.horizontalCenter: parent.horizontalCenter
+                color: 'black'
+            }
+        }
+    }
+
     FileSystemModel {
         id: file_system_model
     }
+
 
     ExampleTreeItemModel {
         id: example_model
@@ -37,13 +70,37 @@ ApplicationWindow {
         }
     }*/
 
-    QxTreeView {
-        id: tree_view
-        anchors.fill: parent
-        //model: example_model
+
+    Column {
+        spacing: 0
+
+        QxHorizontalHeaderView {
+            id: header_view
+            delegate: header_delegate_component
+            syncView: tree_view
+            model: example_model
+            handleDelegate: handle_delegate_component
+        }
+
+        QxTreeView {
+            id: tree_view
+            width: parent.width
+            height: 500
+            //model: example_model
+
+        }
     }
 
-   /* Column {
+
+    /*QxTreeView {
+            id: tree_view
+            width: parent.width
+            height: 500
+            //model: example_model
+        }*/
+
+
+    /* Column {
 
         spacing: 0
 
@@ -117,6 +174,7 @@ ApplicationWindow {
     Component.onCompleted: {
 
         example_model.populate()
+
         tree_view.model = example_model
     }
 }
