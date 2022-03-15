@@ -8,17 +8,26 @@ QxHorizontalHeaderViewTemplate {
 
     property Component delegate
     property Component handleDelegate
+    property alias background: background_loader.sourceComponent
 
     implicitHeight: grid_layout.implicitHeight
     implicitWidth: grid_layout.implicitWidth
 
+    Loader {
+        id: background_loader
+        anchors.fill: parent
+    }
+
     GridLayout {
         id: grid_layout
+
         rows: control.rowCount
         columns: control.columnCount
 
-        columnSpacing: -1
-        rowSpacing: -1
+        flow: GridLayout.LeftToRight
+
+        columnSpacing: 0
+        rowSpacing: 0
 
         Repeater {
             id: repeater
@@ -41,22 +50,18 @@ QxHorizontalHeaderViewTemplate {
                     anchors.fill: parent
                     sourceComponent: control.delegate
 
-                    property QtObject sectionData: QtObject {
-                        property string title: adaptor_title
-                        readonly property int row: adaptor_section.row
-                        readonly property int column: adaptor_section.column
-                    }
+                    property QtObject sectionData: adaptor_section
 
                     onLoaded: {
                         if (adaptor_section.width === -1) {
-                            adaptor_section.width = delegate_loader.item.implicitWidth
+                            adaptor_section.width = Math.min(100, delegate_loader.item.implicitWidth)
                         }
                     }
                 }
 
                 MouseArea {
                     property int offset: 0
-                    readonly property int minimumSize: 20
+                    readonly property int minimumSize: 25
 
                     width: 16
                     height: parent.height

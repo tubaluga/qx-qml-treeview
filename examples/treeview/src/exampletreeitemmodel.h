@@ -49,6 +49,7 @@ public:
     bool setHeaderData(int section, Qt::Orientation orientation, const QVariant &value, int role = Qt::EditRole) override;
 
     Q_INVOKABLE void populate();
+    Q_INVOKABLE void test();
 
 protected:
     Item *indexToItem(const QModelIndex &index) const;

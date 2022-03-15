@@ -106,17 +106,29 @@ void TreeItemModel::populate()
 {
     beginResetModel();
 
+    m_rootItem->children.clear();
+
     auto root_element = m_rootItem->createChild("Root");
 
     root_element->createChild("First");
     root_element->createChild("Second");
-    root_element->createChild("Theerd");
 
     endResetModel();
 
     setHeaderData(0, Qt::Horizontal, "Title", Qt::DisplayRole);
+    //setHeaderData(0, Qt::Horizontal, 100, Qt::EditRole);
     setHeaderData(1, Qt::Horizontal, "UUID", Qt::DisplayRole);
+    //setHeaderData(1, Qt::Horizontal, 50, Qt::EditRole);
     setHeaderData(2, Qt::Horizontal, "Test column title text", Qt::DisplayRole);
+}
+
+void TreeItemModel::test()
+{
+    auto i      = index(0, 0);
+    auto item   = indexToItem(i);
+    item->title = "Test";
+
+    emit dataChanged(i, i, { Qt::DisplayRole });
 }
 
 TreeItemModel::Item *TreeItemModel::indexToItem(const QModelIndex &index) const

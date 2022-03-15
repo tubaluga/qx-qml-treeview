@@ -1,4 +1,6 @@
 #include "qxhorizontalheaderviewtemplate.h"
+#include "qxheadersyncviewmodeladaptor.h"
+#include "qxheadertreemodeladaptor.h"
 #include "qxtreeviewtemplate.h"
 
 #include <QQmlContext>
@@ -11,122 +13,83 @@ public:
     QxHorizontalHeaderViewTemplatePrivate(QxHorizontalHeaderViewTemplate *parent) :
         q_ptr(parent)
     {
-        adaptor = new QxHeaderModelAdaptor(parent);
     }
 
-    void createSectionsBySyncView()
+    void bindingAdaptor()
     {
-        if (!syncView.isNull() && syncView->model() != nullptr && q_ptr->model() == nullptr) {
-            q_ptr->clearSections();
-
-            auto source_model = syncView->model();
-
-            if (source_model == nullptr) {
-                return;
-            }
-
-            for (int col = 0; col < source_model->columnCount(); ++col) {
-                QxHeaderSection *section = new QxHeaderSection(q_ptr);
-                section->setTitle(source_model->headerData(col, Qt::Horizontal).toString());
-
-                q_ptr->appendSection(section);
-            }
-
-            q_ptr->invalidate();
-
-            syncColumnSize();
+        foreach (const auto &connection, adaptor_connections) {
+            QObject::disconnect(connection);
         }
+
+        adaptor_connections << QObject::connect(adaptor, &QxHeaderModelAdaptor::sectionColumnCountChanged, q_ptr, [this]() {
+            q_ptr->setColumnCount(adaptor->sectionColumnCount());
+            updateDefaultColumnWidth();
+        });
+
+        adaptor_connections << QObject::connect(adaptor, &QxHeaderModelAdaptor::sectionRowCountChanged, q_ptr, [this]() {
+            q_ptr->setRowCount(adaptor->sectionRowCount());
+            updateDefaultColumnWidth();
+        });
     }
 
-    void createSectionsByRow(QAbstractItemModel *model, const QModelIndex &index, QxHeaderSection *parent_section)
+    void bindingSyncView()
     {
-        for (int row = 0; row < model->rowCount(index); ++row) {
-            auto child_index = model->index(row, 0, index);
+        foreach (const auto &connection, view_connections) {
+            QObject::disconnect(connection);
+        }
 
-            QxHeaderSection *section = new QxHeaderSection(parent_section);
-            section->setTitle(model->data(child_index).toString());
+        view_connections << QObject::connect(sync_view, &QxTreeViewTemplate::modelChanged, q_ptr, [this]() {
+            setSyncViewModel();
+        });
+    }
 
-            if (child_index.isValid()) {
-                createSectionsByRow(model, child_index, section);
+    void setSyncViewModel()
+    {
+        if (q_ptr->model() == nullptr) {
+            auto adaptor = new QxHeaderSyncViewModelAdaptor(q_ptr);
+            q_ptr->setAdaptor(adaptor);
+
+            if (sync_view) {
+                adaptor->setSource(sync_view->model());
             }
 
-            if (parent_section == nullptr) {
-                q_ptr->appendSection(section);
-            }
-            else {
-                parent_section->appendSection(section);
-            }
+            updateDefaultColumnWidth();
+            syncSectionWidth();
         }
     }
 
-    void createSectionsFromInternalModel()
+    void syncSectionWidth()
     {
-        if (q_ptr->model()) {
-            q_ptr->clearSections();
-
-            createSectionsByRow(q_ptr->model(), QModelIndex(), nullptr);
-
-            q_ptr->invalidate();
-
-            syncColumnSize();
-        }
-    }
-
-    void syncColumnSize()
-    {
-        if (syncView.isNull()) {
-            return;
-        }
-
-        auto leaf_sections = adaptor->root()->leafs();
-
-        foreach (auto leaf, leaf_sections) {
-            if (syncView->model()) {
-                syncView->model()->setHeaderData(leaf->column(), Qt::Horizontal, leaf->width());
+        if (adaptor && sync_view && sync_view->model()) {
+            foreach (auto section, adaptor->root()->leafs()) {
+                sync_view->model()->setHeaderData(section->column(), Qt::Horizontal, section->width());
             }
-
-            QObject::connect(leaf, &QxHeaderSection::widthChanged, q_ptr, [leaf, this]() {
-                if (syncView->model()) {
-                    syncView->model()->setHeaderData(leaf->column(), Qt::Horizontal, leaf->width());
-                }
-            });
         }
     }
 
-    void setSyncViewModel(QAbstractItemModel *model)
+    void updateDefaultColumnWidth()
     {
-        if (syncViewModel == model) {
-            return;
-        }
-
-        if (!syncViewModel.isNull()) {
-            QObject::disconnect(syncViewModelConnection);
-        }
-
-        syncViewModel = model;
-
-        if (syncViewModel) {
-            syncViewModelConnection = QObject::connect(syncViewModel, &QAbstractItemModel::modelReset, q_ptr, [this]() {
-                createSectionsBySyncView();
-            });
-
-            createSectionsBySyncView();
-        }
+        /*if (default_column_width < 1 && sync_view) {
+            int defautl_width = sync_view->width() / q_ptr->columnCount();
+            q_ptr->setDefaultColumnWidth(defautl_width);
+        }*/
     }
 
     QxHeaderModelAdaptor *adaptor         = nullptr;
     QxHorizontalHeaderViewTemplate *q_ptr = nullptr;
-    int rowCount                          = 0;
-    int columnCount                       = 0;
-    QPointer<QAbstractItemModel> syncViewModel;
-    QPointer<QxTreeViewTemplate> syncView;
-    QMetaObject::Connection modelConnection;
-    QMetaObject::Connection syncViewModelConnection;
+    int row_count                         = 0;
+    int column_count                      = 0;
+    QPointer<QxTreeViewTemplate> sync_view;
+    qreal default_column_width = 0;
+    QVector<QMetaObject::Connection> adaptor_connections;
+    QVector<QMetaObject::Connection> view_connections;
+    QVector<QMetaObject::Connection> header_view_connections;
 };
 
 QxHorizontalHeaderViewTemplate::QxHorizontalHeaderViewTemplate(QQuickItem *parent) :
     QxHeaderViewTemplate(parent), d_ptr(new QxHorizontalHeaderViewTemplatePrivate(this))
 {
+    setZ(2);
 }
 
 QxHorizontalHeaderViewTemplate::~QxHorizontalHeaderViewTemplate()
@@ -134,88 +97,124 @@ QxHorizontalHeaderViewTemplate::~QxHorizontalHeaderViewTemplate()
     delete d_ptr;
 }
 
-void QxHorizontalHeaderViewTemplate::invalidate()
-{
-    d_ptr->adaptor->setSections(sections());
-    setColumnCount(d_ptr->adaptor->root()->leafCount());
-    setRowCount(d_ptr->adaptor->root()->maxChildrenDepth());
-}
-
 void QxHorizontalHeaderViewTemplate::setupModel(QAbstractItemModel *new_model, QAbstractItemModel *old_model)
 {
-    if (old_model != nullptr) {
-        disconnect(d_ptr->modelConnection);
-    }
+    auto tree_adaptor = new QxHeaderTreeModelAdaptor(this);
 
-    if (new_model != nullptr) {
-        d_ptr->modelConnection = connect(new_model, &QAbstractListModel::modelReset, this, [this]() {
-            d_ptr->createSectionsFromInternalModel();
-        });
-    }
+    tree_adaptor->setSource(model());
 
-    d_ptr->createSectionsFromInternalModel();
-}
+    setAdaptor(tree_adaptor);
 
-void QxHorizontalHeaderViewTemplate::syncViewModelChanged()
-{
-    if (d_ptr->syncView) {
-        d_ptr->setSyncViewModel(d_ptr->syncView->model());
-    }
+    d_ptr->syncSectionWidth();
 }
 
 int QxHorizontalHeaderViewTemplate::columnCount() const
 {
-    return d_ptr->columnCount;
+    return d_ptr->column_count;
 }
 
 void QxHorizontalHeaderViewTemplate::setColumnCount(int newColumnCount)
 {
-    if (d_ptr->columnCount == newColumnCount) {
+    if (d_ptr->column_count == newColumnCount) {
         return;
     }
 
-    d_ptr->columnCount = newColumnCount;
+    d_ptr->column_count = newColumnCount;
     emit columnCountChanged();
+}
+
+void QxHorizontalHeaderViewTemplate::setAdaptor(QxHeaderModelAdaptor *adaptor)
+{
+    if (d_ptr->adaptor == adaptor) {
+        return;
+    }
+
+    if (d_ptr->adaptor) {
+        d_ptr->adaptor->deleteLater();
+    }
+
+    foreach (const auto &connection, d_ptr->header_view_connections) {
+        disconnect(connection);
+    }
+
+    d_ptr->adaptor = adaptor;
+    d_ptr->adaptor->setSectionDefaultWidth(defaultColumnWidth());
+
+    setColumnCount(d_ptr->adaptor->sectionColumnCount());
+    setRowCount(d_ptr->adaptor->sectionRowCount());
+
+    d_ptr->bindingAdaptor();
+
+    emit adaptorChanged();
+
+    d_ptr->header_view_connections << connect(this, &QxHorizontalHeaderViewTemplate::defaultColumnWidthChanged, d_ptr->adaptor, [this]() {
+        d_ptr->adaptor->setSectionDefaultWidth(defaultColumnWidth());
+    });
+
+    d_ptr->header_view_connections << connect(adaptor, &QxHeaderModelAdaptor::sectionWidthChanged, this, [this](int section, qreal width) {
+        if (syncView() && syncView()->model()) {            
+            syncView()->model()->setHeaderData(section, Qt::Horizontal, width);
+        }
+    });
+
+    d_ptr->updateDefaultColumnWidth();
+}
+
+qreal QxHorizontalHeaderViewTemplate::defaultColumnWidth() const
+{
+    return d_ptr->default_column_width;
+}
+
+void QxHorizontalHeaderViewTemplate::setDefaultColumnWidth(qreal newDefaultColumnWidth)
+{
+    if (d_ptr->default_column_width == newDefaultColumnWidth) {
+        return;
+    }
+
+    d_ptr->default_column_width = newDefaultColumnWidth;
+
+    if (d_ptr->adaptor) {
+        d_ptr->adaptor->setSectionDefaultWidth(newDefaultColumnWidth);
+    }
+
+    emit defaultColumnWidthChanged();
 }
 
 QxTreeViewTemplate *QxHorizontalHeaderViewTemplate::syncView() const
 {
-    return d_ptr->syncView;
+    return d_ptr->sync_view;
 }
 
 void QxHorizontalHeaderViewTemplate::setSyncView(QxTreeViewTemplate *newSyncView)
 {
-    if (d_ptr->syncView == newSyncView) {
+    if (d_ptr->sync_view == newSyncView) {
         return;
     }
 
-    if (d_ptr->syncView) {
-        disconnect(d_ptr->syncView, &QxTreeViewTemplate::modelChanged, this, &QxHorizontalHeaderViewTemplate::syncViewModelChanged);
-    }
+    d_ptr->sync_view = newSyncView;
 
-    d_ptr->syncView = newSyncView;
+    d_ptr->updateDefaultColumnWidth();
 
-    if (d_ptr->syncView) {
-        connect(d_ptr->syncView, &QxTreeViewTemplate::modelChanged, this, &QxHorizontalHeaderViewTemplate::syncViewModelChanged);
-    }
+    d_ptr->setSyncViewModel();
 
-    d_ptr->createSectionsBySyncView();
+    d_ptr->syncSectionWidth();
+    d_ptr->bindingSyncView();
 
     emit syncViewChanged();
 }
 
 int QxHorizontalHeaderViewTemplate::rowCount() const
 {
-    return d_ptr->rowCount;
+    return d_ptr->row_count;
 }
 
 void QxHorizontalHeaderViewTemplate::setRowCount(int newRowCount)
 {
-    if (d_ptr->rowCount == newRowCount) {
+    if (d_ptr->row_count == newRowCount) {
         return;
     }
 
-    d_ptr->rowCount = newRowCount;
+    d_ptr->row_count = newRowCount;
     emit rowCountChanged();
 }
 

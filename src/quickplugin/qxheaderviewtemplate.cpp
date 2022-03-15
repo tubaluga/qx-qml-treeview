@@ -7,7 +7,7 @@
 QxHeaderViewTemplate::QxHeaderViewTemplate(QQuickItem *parent) :
     QQuickItem(parent)
 {
-    m_rootSection = new QxHeaderSection(this);
+    setZ(1);
 }
 
 QxHeaderViewTemplate::~QxHeaderViewTemplate()
@@ -32,21 +32,6 @@ void QxHeaderViewTemplate::setModel(QAbstractItemModel *newModel)
     setupModel(m_model.data(), old_model);
 
     emit modelChanged();
-}
-
-QQmlComponent *QxHeaderViewTemplate::sectionDelegate() const
-{
-    return m_sectionDelegate;
-}
-
-void QxHeaderViewTemplate::setSectionDelegate(QQmlComponent *newDelegate)
-{
-    if (m_sectionDelegate == newDelegate) {
-        return;
-    }
-
-    m_sectionDelegate = newDelegate;
-    emit sectionDelegateChanged();
 }
 
 quint32 QxHeaderViewTemplate::displayTextRole() const
@@ -111,12 +96,11 @@ QQmlListProperty<QxHeaderSection> QxHeaderViewTemplate::sectionListProperty()
 void QxHeaderViewTemplate::appendSection(QxHeaderSection *section)
 {
     m_sections.append(section);
-    invalidate();
 }
 
 int QxHeaderViewTemplate::sectionCount()
 {
-    return m_sections.size();
+    return m_sections.size();    
 }
 
 QxHeaderSection *QxHeaderViewTemplate::section(int index)
@@ -151,9 +135,4 @@ QxHeaderSection *QxHeaderViewTemplate::section(QQmlListProperty<QxHeaderSection>
 void QxHeaderViewTemplate::clearSections(QQmlListProperty<QxHeaderSection> *list)
 {
     reinterpret_cast<QxHeaderViewTemplate *>(list->data)->clearSections();
-}
-
-QxHeaderSection *QxHeaderViewTemplate::rootSection() const
-{
-    return m_rootSection;
 }

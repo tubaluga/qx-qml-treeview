@@ -17,8 +17,12 @@ void QxHeaderModelAdaptor::setSource(QAbstractItemModel *newSource)
     if (m_source == newSource) {
         return;
     }
+    auto cur_model = m_source.data();
 
     m_source = newSource;
+
+    onSourceModelChanged(m_source, cur_model);
+
     emit sourceChanged();
 }
 
@@ -34,6 +38,11 @@ void QxHeaderModelAdaptor::setSections(const QList<QxHeaderSection *> &newSectio
     std::function<void(QxHeaderSection * section)> tree_visitor = [&tree_visitor, this](QxHeaderSection *section) {
         for (int i = 0; i < section->sections().size(); ++i) {
             auto s = section->sections().at(i);
+
+            if (s->isLeaf() && s->width() < 1) {
+                s->setWidth(sectionDefaultWidth());
+            }
+
             m_sections << s;
 
             tree_visitor(s);
@@ -42,10 +51,25 @@ void QxHeaderModelAdaptor::setSections(const QList<QxHeaderSection *> &newSectio
 
     tree_visitor(m_root);
 
+    foreach (const auto &connection, m_connections) {
+        disconnect(connection);
+    }
+
+    foreach (auto column_section, m_root->leafs()) {
+        m_connections << connect(column_section, &QxHeaderSection::widthChanged, this, [column_section, this]() {
+            emit sectionWidthChanged(column_section->column(), column_section->width());
+        });
+    }
+
+    setSectionColumnCount(root()->leafCount());
+    setSectionRowCount(root()->maxChildrenDepth());
+
     invalidate();
 
     beginResetModel();
     endResetModel();
+
+    updateColumnSize();
 }
 
 int QxHeaderModelAdaptor::rowCount(const QModelIndex &parent) const
@@ -102,7 +126,7 @@ void QxHeaderModelAdaptor::invalidate()
 {
     foreach (auto section, m_sections) {
         section->invalidate();
-    }
+    }    
 }
 
 int QxHeaderModelAdaptor::sectionColumn(QxHeaderSection *section) const
@@ -138,6 +162,69 @@ int QxHeaderModelAdaptor::sectionColumn(QxHeaderSection *section) const
     return column;
 }
 
+void QxHeaderModelAdaptor::onSourceModelChanged(QAbstractItemModel *new_model, QAbstractItemModel *old_model)
+{
+    Q_UNUSED(new_model)
+    Q_UNUSED(old_model)
+}
+
+void QxHeaderModelAdaptor::updateColumnSize()
+{
+    auto leaf_sections = root()->leafs();
+
+    foreach (auto leaf, leaf_sections) {
+        emit sectionWidthChanged(leaf->column(), leaf->width());
+    }
+}
+
+int QxHeaderModelAdaptor::sectionRowCount() const
+{
+    return m_sectionRowCount;
+}
+
+void QxHeaderModelAdaptor::setSectionRowCount(int newSectionRowCount)
+{
+    if (m_sectionRowCount == newSectionRowCount) {
+        return;
+    }
+
+    m_sectionRowCount = newSectionRowCount;
+    emit sectionRowCountChanged();
+}
+
+qreal QxHeaderModelAdaptor::sectionDefaultWidth() const
+{
+    return m_sectionDefaultWidth;
+}
+
+void QxHeaderModelAdaptor::setSectionDefaultWidth(qreal newSectionDefaultWidth)
+{
+    if (m_sectionDefaultWidth == newSectionDefaultWidth) {
+        return;
+    }
+
+    m_sectionDefaultWidth = newSectionDefaultWidth;
+
+    foreach (auto section, m_sections) {
+        if (section->isLeaf() && section->width() < 1) {
+            section->setWidth(sectionDefaultWidth());
+        }
+    }
+}
+
+int QxHeaderModelAdaptor::sectionColumnCount() const
+{
+    return m_sectionColumnCount;
+}
+
+void QxHeaderModelAdaptor::setSectionColumnCount(int newSectionColumnCount)
+{
+    if (m_sectionColumnCount == newSectionColumnCount)
+        return;
+    m_sectionColumnCount = newSectionColumnCount;
+    emit sectionColumnCountChanged();
+}
+
 QxHeaderSection *QxHeaderModelAdaptor::root() const
 {
     return m_root;
@@ -150,8 +237,10 @@ void QxHeaderModelAdaptor::setRoot(QxHeaderSection *newRoot)
     setSections(m_root->sections());
 }
 
-void QxHeaderModelAdaptor::addSectionWidthOffset(QxHeaderSection *section, int offset)
+void QxHeaderModelAdaptor::addSectionWidthOffset(QxHeaderSection *section, qreal offset)
 {
+    static qreal minimum_column_width = 25;
+
     if (section == nullptr) {
         return;
     }
@@ -159,17 +248,17 @@ void QxHeaderModelAdaptor::addSectionWidthOffset(QxHeaderSection *section, int o
     auto parent_section = section->parentSection();
 
     while (parent_section) {
-        parent_section->setWidth(qMax(20, parent_section->width() + offset));
+        parent_section->setWidth(qMax(minimum_column_width, parent_section->width() + offset));
         parent_section = parent_section->parentSection();
     }
 
-    section->setWidth(section->width() + offset);
+    section->setWidth(qMax(minimum_column_width, section->width() + offset));
 
     if (!section->sections().isEmpty()) {
         auto child_section = section->sections().last();
 
         while (child_section != nullptr) {
-            child_section->setWidth(qMax(20, child_section->width() + offset));
+            child_section->setWidth(qMax(minimum_column_width, child_section->width() + offset));
 
             if (!child_section->sections().isEmpty()) {
                 child_section = child_section->sections().last();

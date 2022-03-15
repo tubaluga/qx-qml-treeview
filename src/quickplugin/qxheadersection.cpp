@@ -15,6 +15,8 @@ void QxHeaderSection::appendSection(QxHeaderSection *section)
     section->setParentSection(this);
     m_sections.append(section);
 
+    emit isLeafChanged();
+
     section->invalidate();
 }
 
@@ -30,6 +32,9 @@ QxHeaderSection *QxHeaderSection::section(int index)
 
 void QxHeaderSection::clearSections()
 {
+    foreach (auto section, m_sections) {
+        section->deleteLater();
+    }
     m_sections.clear();
 }
 
@@ -176,6 +181,8 @@ void QxHeaderSection::invalidate()
             setRowSpan(max_depth - current_depth);
         }
     }
+
+    emit depthChanged();
 }
 
 QxHeaderSection *QxHeaderSection::parentSection() const
@@ -199,18 +206,19 @@ QxHeaderSection *QxHeaderSection::rootSection() const
     return p;
 }
 
-int QxHeaderSection::width() const
+qreal QxHeaderSection::width() const
 {
     return m_width;
 }
 
-void QxHeaderSection::setWidth(int newWidth)
+void QxHeaderSection::setWidth(qreal newWidth)
 {
     if (m_width == newWidth) {
         return;
     }
 
     m_width = newWidth;
+
     emit widthChanged();
 }
 

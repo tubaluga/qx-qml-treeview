@@ -1,12 +1,11 @@
 import QtQuick 2.0
-import QtQuick.Controls 2.0
 
 import Qx.treeview 1.0
 
 QxTreeViewCellDelegateTemplate {
     id: control
 
-    implicitHeight: content.implicitHeight
+    /*implicitHeight: content.implicitHeight
     implicitWidth: content.implicitWidth
 
     Control {
@@ -15,8 +14,8 @@ QxTreeViewCellDelegateTemplate {
         padding: 6
 
         contentItem: Text {
-            text: qsTr("text")
+            text: modelData.displayText
             wrapMode: Text.Wrap
         }
-    }
+    }*/
 }

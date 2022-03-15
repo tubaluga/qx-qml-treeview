@@ -5,12 +5,12 @@ QxTreeViewSectionModelData::QxTreeViewSectionModelData(QObject *parent)
 {
 }
 
-qint32 QxTreeViewSectionModelData::width() const
+qreal QxTreeViewSectionModelData::width() const
 {
     return m_width;
 }
 
-void QxTreeViewSectionModelData::setWidth(qint32 newWidth)
+void QxTreeViewSectionModelData::setWidth(qreal newWidth)
 {
     if (m_width == newWidth) {
         return;

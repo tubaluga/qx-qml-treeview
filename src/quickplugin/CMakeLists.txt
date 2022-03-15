@@ -1,6 +1,6 @@
 project(qx-qml-treeview-quickplugin)
 
-find_package(Qt5 REQUIRED COMPONENTS Core Qml Quick)
+find_package(Qt5 REQUIRED COMPONENTS Core Qml Quick QuickControls2)
 
 add_library(${PROJECT_NAME} SHARED)
 
@@ -40,29 +40,29 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 
 if(MSVC)
 	
-	set_target_properties(${PROJECT_NAME} PROPERTIES
-		DEBUG_POSTFIX "d"
-	)
+    set_target_properties(${PROJECT_NAME} PROPERTIES
+        DEBUG_POSTFIX "d"
+    )
 
     target_compile_options(${PROJECT_NAME} PUBLIC "/utf-8")
 endif()
 
 add_definitions(-DQT_PLUGIN)
 
-include(QmlPlugin)
+#include(QmlPlugin)
 
-FindQmlPluginDump()
+#FindQmlPluginDump()
 
-set(GENERATE_QMLTYPES_COMMAND ${QMLPLUGINDUMP_BIN} -nonrelocatable "Qx.treeview" "1.0" "${OUTPUT_DIR}/${QX_BIN_DIR}" > ${CMAKE_CURRENT_BINARY_DIR}/plugin.qmltypes)
+#set(GENERATE_QMLTYPES_COMMAND ${QMLPLUGINDUMP_BIN} -nonrelocatable "Qx.treeview" "1.0" "${OUTPUT_DIR}/${QX_BIN_DIR}" > ${CMAKE_CURRENT_BINARY_DIR}/plugin.qmltypes)
 
-message("${GENERATE_QMLTYPES_COMMAND}")
+#message("${GENERATE_QMLTYPES_COMMAND}")
 
 #add_custom_command(
-#	    TARGET ${PROJECT_NAME}
-#		POST_BUILD
-#		COMMAND ${GENERATE_QMLTYPES_COMMAND}
-#		COMMENT "Generating plugin.qmltypes"
-#		)
+#            TARGET ${PROJECT_NAME}
+#                POST_BUILD
+#                COMMAND ${GENERATE_QMLTYPES_COMMAND}
+#                COMMENT "Generating plugin.qmltypes"
+#                )
 
 target_include_directories(${PROJECT_NAME} PUBLIC
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/>
@@ -74,6 +74,8 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 		Qt5::Qml
 		Qt5::Quick		
 		Qt5::QuickPrivate
+		Qt5::QuickControls2
+		Qt5::QuickControls2Private
 	)
 
 set(MODULE_DIR share/imports/Qx/treeview/)

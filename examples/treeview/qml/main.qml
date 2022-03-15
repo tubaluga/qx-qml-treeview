@@ -1,4 +1,5 @@
 import QtQuick 2.11
+import QtQuick.Layouts 1.0
 import QtQuick.Controls 2.2
 
 import Qx.treeview 1.0
@@ -16,7 +17,10 @@ ApplicationWindow {
         id: header_delegate_component
 
         Control {
-            background:  Item {
+            background:  Rectangle {
+                color: 'white'
+                border.width: 1
+                border.color: 'black'
                 Rectangle {
                     height: 1
                     width: parent.width
@@ -26,7 +30,7 @@ ApplicationWindow {
             }
             contentItem: Text {
                 padding: 8
-                text: sectionData.title
+                text: !!sectionData ? sectionData.title : ''
                 elide: Text.ElideRight
             }
         }
@@ -48,133 +52,71 @@ ApplicationWindow {
         id: file_system_model
     }
 
-
     ExampleTreeItemModel {
         id: example_model
     }
 
-    /*QxTreeView {
+    Component.onCompleted: example_model.populate()
+
+    ColumnLayout {
         anchors.fill: parent
-        model: example_model
-    }*/
+        anchors.margins: 16
+        spacing: 8
 
-    /*QxHorisontalHeaderView {
-        id: header_view
+        RowLayout {
+            spacing: 8
 
-        model: example_model
+            Button {
+                text: 'Populate'
+                onClicked: {
+                    example_model.populate()
+                }
+            }
 
-        Component.onCompleted: {
-            header_view.setSectionWidth(0, 100)
-            header_view.setSectionWidth(1, 200)
-            header_view.setSectionWidth(2, 300)
+            Button {
+                text: 'Test'
+                onClicked: example_model.test()
+            }
         }
-    }*/
 
 
-    Column {
-        spacing: 0
-
-        QxHorizontalHeaderView {
-            id: header_view
-            delegate: header_delegate_component
-            syncView: tree_view
-            model: example_model
-            handleDelegate: handle_delegate_component
-        }
 
         QxTreeView {
             id: tree_view
-            width: parent.width
-            height: 500
-            //model: example_model
 
-        }
-    }
+            Layout.fillHeight: true
+            Layout.fillWidth: true
 
+            clip: true
 
-    /*QxTreeView {
-            id: tree_view
-            width: parent.width
-            height: 500
-            //model: example_model
-        }*/
+            background: Rectangle {
+                color: 'orange'
+            }
 
+            model: example_model
+            delegate: Rectangle {
+                implicitHeight: text_item.implicitHeight
+                implicitWidth: text_item.implicitWidth
 
-    /* Column {
+                color: isHovered ? 'gray' : 'transparent'
 
-        spacing: 0
-
-        QxHorizontalHeaderView {
-            id: header_view
-
-            delegate: Control {
-                background:  Item {
-                    Rectangle {
-                        height: 1
-                        width: parent.width
-                        y: parent.height-1
-                        color: 'black'
-                    }
-                }
-                contentItem: Text {
-                    padding: 8
-                    text: sectionData.title
+                Text {
+                    id: text_item
+                    padding: 16
+                    text: !!modelData.displayText ? modelData.displayText : ''
+                    width: parent.width
+                    elide: Text.ElideRight
                 }
             }
 
-            handleDelegate: Item {
-                Rectangle {
-                    width: 1
-                    height: parent.height
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    color: 'black'
-                }
+            header: QxHorizontalHeaderView {
+                id: header_view
+                delegate: header_delegate_component
+                syncView: tree_view
+                model: example_model
+                defaultColumnWidth: tree_view.width / columnCount
+                handleDelegate: handle_delegate_component
             }
-
-            sections: [
-                QxHeaderSection {
-                    title: qsTr("General 1")
-                    sections: [
-                        QxHeaderSection { title: qsTr("First") },
-                        QxHeaderSection {
-                            title: qsTr("Second")
-                            sections: [
-
-                                QxHeaderSection {
-                                    title: qsTr("Test")
-                                    sections: [
-                                        QxHeaderSection { title: qsTr("T (1)") },
-                                        QxHeaderSection { title: qsTr("T (2)") },
-                                        QxHeaderSection { title: qsTr("T (3)") }
-                                    ]
-                                },
-                                QxHeaderSection { title: qsTr("R1") },
-                                QxHeaderSection { title: qsTr("R3") }
-                            ]
-                        }
-                    ]
-                },
-                QxHeaderSection {
-                    title: qsTr("General 2")
-
-                    sections: [
-                        QxHeaderSection { title: qsTr("G1") },
-                        QxHeaderSection { title: qsTr("G2") },
-                        QxHeaderSection { title: qsTr("G3") }
-                    ]
-                },
-                QxHeaderSection {
-                    title: qsTr("General 3")
-                }
-            ]
         }
-    }*/
-
-
-    Component.onCompleted: {
-
-        example_model.populate()
-
-        tree_view.model = example_model
     }
 }

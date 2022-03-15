@@ -222,13 +222,20 @@ const QModelIndex &QxQuickTreeModelAdaptor::mapToModel(const QModelIndex &index)
     return m_items.at(index.row()).index;
 }
 
-QModelIndex QxQuickTreeModelAdaptor::mapRowToModelIndex(int row) const
+QModelIndex QxQuickTreeModelAdaptor::mapRowToModelIndex(int row, int column) const
 {
     if (!m_model)
         return QModelIndex();
     if (row < 0 || row >= m_items.count())
         return QModelIndex();
-    return m_items.at(row).index;
+
+    auto item = m_items.at(row).index;
+
+    if (column == 0) {
+        return item;
+    }
+
+    return item.model()->index(item.row(), column, item.parent());
 }
 
 QItemSelection QxQuickTreeModelAdaptor::selectionForRowRange(const QModelIndex &fromIndex, const QModelIndex &toIndex) const
