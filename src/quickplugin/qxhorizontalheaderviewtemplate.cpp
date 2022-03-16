@@ -1,7 +1,7 @@
 #include "qxhorizontalheaderviewtemplate.h"
 #include "qxheadersyncviewmodeladaptor.h"
 #include "qxheadertreemodeladaptor.h"
-#include "qxtreeviewtemplate.h"
+#include "qxquicktreeviewtemplate.h"
 
 #include <QQmlContext>
 #include <QQmlEngine>
@@ -38,7 +38,7 @@ public:
             QObject::disconnect(connection);
         }
 
-        view_connections << QObject::connect(sync_view, &QxTreeViewTemplate::modelChanged, q_ptr, [this]() {
+        view_connections << QObject::connect(sync_view, &QxQuickTreeViewTemplate::modelChanged, q_ptr, [this]() {
             setSyncViewModel();
         });
     }
@@ -60,9 +60,9 @@ public:
 
     void syncSectionWidth()
     {
-        if (adaptor && sync_view && sync_view->model()) {
+        if (adaptor && sync_view) {
             foreach (auto section, adaptor->root()->leafs()) {
-                sync_view->model()->setHeaderData(section->column(), Qt::Horizontal, section->width());
+                sync_view->setColumnWidth(section->column(), section->width());
             }
         }
     }
@@ -79,8 +79,8 @@ public:
     QxHorizontalHeaderViewTemplate *q_ptr = nullptr;
     int row_count                         = 0;
     int column_count                      = 0;
-    QPointer<QxTreeViewTemplate> sync_view;
-    qreal default_column_width = 0;
+    QPointer<QxQuickTreeViewTemplate> sync_view;
+    qreal default_column_width = 250;
     QVector<QMetaObject::Connection> adaptor_connections;
     QVector<QMetaObject::Connection> view_connections;
     QVector<QMetaObject::Connection> header_view_connections;
@@ -152,8 +152,8 @@ void QxHorizontalHeaderViewTemplate::setAdaptor(QxHeaderModelAdaptor *adaptor)
     });
 
     d_ptr->header_view_connections << connect(adaptor, &QxHeaderModelAdaptor::sectionWidthChanged, this, [this](int section, qreal width) {
-        if (syncView() && syncView()->model()) {            
-            syncView()->model()->setHeaderData(section, Qt::Horizontal, width);
+        if (syncView()) {
+            syncView()->setColumnWidth(section, width);
         }
     });
 
@@ -180,12 +180,12 @@ void QxHorizontalHeaderViewTemplate::setDefaultColumnWidth(qreal newDefaultColum
     emit defaultColumnWidthChanged();
 }
 
-QxTreeViewTemplate *QxHorizontalHeaderViewTemplate::syncView() const
+QxQuickTreeViewTemplate *QxHorizontalHeaderViewTemplate::syncView() const
 {
     return d_ptr->sync_view;
 }
 
-void QxHorizontalHeaderViewTemplate::setSyncView(QxTreeViewTemplate *newSyncView)
+void QxHorizontalHeaderViewTemplate::setSyncView(QxQuickTreeViewTemplate *newSyncView)
 {
     if (d_ptr->sync_view == newSyncView) {
         return;

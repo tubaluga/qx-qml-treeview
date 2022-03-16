@@ -11,23 +11,18 @@ QxTreeViewTemplate {
     property alias background: background_loader.sourceComponent
 
     function expand(index) {
-        var model_index = model_adaptor.mapRowToModelIndex(index)
-        model_adaptor.expand(model_index)
+        var model_index = adaptor.mapRowToModelIndex(index)
+        adaptor.expand(model_index)
     }
 
     function collapse(index) {
-        var model_index = model_adaptor.mapRowToModelIndex(index)
-        model_adaptor.collapse(model_index)
+        var model_index = adaptor.mapRowToModelIndex(index)
+        adaptor.collapse(model_index)
     }
 
     function isExpanded(index) {
-        var model_index = model_adaptor.mapRowToModelIndex(index)
-        return model_adaptor.isExpanded(model_index)
-    }
-
-    QxQuickTreeModelAdaptor {
-        id: model_adaptor
-        model: root.model
+        var model_index = adaptor.mapRowToModelIndex(index)
+        return adaptor.isExpanded(model_index)
     }
 
     Loader {
@@ -44,7 +39,7 @@ QxTreeViewTemplate {
 
         headerPositioning: ListView.OverlayHeader
 
-        model: model_adaptor
+        model: adaptor
         delegate: QxTreeViewRow {
 
             view: root

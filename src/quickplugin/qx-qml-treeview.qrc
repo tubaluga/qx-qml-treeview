@@ -2,7 +2,6 @@
     <qresource prefix="/">
         <file>qx-qml-treeview/QxTreeView.qml</file>
         <file>media/arrow_right_black_24dp.svg</file>
-        <file>qx-qml-treeview/QxTreeViewCell.qml</file>
         <file>qx-qml-treeview/QxTreeViewRow.qml</file>
         <file>qx-qml-treeview/QxHorizontalHeaderView.qml</file>
     </qresource>

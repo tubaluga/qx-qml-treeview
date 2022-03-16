@@ -6,7 +6,7 @@
 #include "qxheaderviewtemplate.h"
 #include "qxtreeviewsectionmodeldata.h"
 
-class QxTreeViewTemplate;
+class QxQuickTreeViewTemplate;
 class QxHorizontalHeaderViewTemplatePrivate;
 
 class QxHorizontalHeaderViewTemplate : public QxHeaderViewTemplate {
@@ -16,7 +16,7 @@ class QxHorizontalHeaderViewTemplate : public QxHeaderViewTemplate {
     Q_PROPERTY(QxHeaderModelAdaptor *adaptor READ adaptor NOTIFY adaptorChanged)
     Q_PROPERTY(int rowCount READ rowCount NOTIFY rowCountChanged)
     Q_PROPERTY(int columnCount READ columnCount NOTIFY columnCountChanged)
-    Q_PROPERTY(QxTreeViewTemplate *syncView READ syncView WRITE setSyncView NOTIFY syncViewChanged)
+    Q_PROPERTY(QxQuickTreeViewTemplate *syncView READ syncView WRITE setSyncView NOTIFY syncViewChanged)
     Q_PROPERTY(qreal defaultColumnWidth READ defaultColumnWidth WRITE setDefaultColumnWidth NOTIFY defaultColumnWidthChanged)
 
 public:
@@ -28,8 +28,8 @@ public:
     int rowCount() const;
     int columnCount() const;
 
-    QxTreeViewTemplate *syncView() const;
-    void setSyncView(QxTreeViewTemplate *newSyncView);
+    QxQuickTreeViewTemplate *syncView() const;
+    void setSyncView(QxQuickTreeViewTemplate *newSyncView);
 
     qreal defaultColumnWidth() const;
     void setDefaultColumnWidth(qreal newDefaultColumnWidth);

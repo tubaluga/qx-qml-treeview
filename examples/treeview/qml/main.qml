@@ -13,109 +13,64 @@ ApplicationWindow {
     title: Qt.application.displayName
     visible: true
 
-    Component {
-        id: header_delegate_component
-
-        Control {
-            background:  Rectangle {
-                color: 'white'
-                border.width: 1
-                border.color: 'black'
-                Rectangle {
-                    height: 1
-                    width: parent.width
-                    y: parent.height-1
-                    color: 'black'
-                }
-            }
-            contentItem: Text {
-                padding: 8
-                text: !!sectionData ? sectionData.title : ''
-                elide: Text.ElideRight
-            }
-        }
-    }
-
-    Component {
-        id: handle_delegate_component
-        Item {
-            Rectangle {
-                width: 1
-                height: parent.height
-                anchors.horizontalCenter: parent.horizontalCenter
-                color: 'black'
-            }
-        }
-    }
-
-    FileSystemModel {
-        id: file_system_model
-    }
-
     ExampleTreeItemModel {
         id: example_model
     }
 
     Component.onCompleted: example_model.populate()
 
-    ColumnLayout {
+    QxTreeView {
+        id: tree_view
+
         anchors.fill: parent
         anchors.margins: 16
-        spacing: 8
 
-        RowLayout {
-            spacing: 8
+        clip: true
 
-            Button {
-                text: 'Populate'
-                onClicked: {
-                    example_model.populate()
-                }
+        background: Rectangle {
+            color: '#ffffff'
+        }
+
+        model: exampleModel
+        delegate: Control {
+
+            implicitWidth: 200
+
+            background: Rectangle {
+                color: isHovered ? '#f9fafc' : 'transparent'
             }
 
-            Button {
-                text: 'Test'
-                onClicked: example_model.test()
+            contentItem: Text {
+                padding: 16
+                text: !!modelData.displayText ? modelData.displayText : ''
+                width: parent.width
+                elide: Text.ElideRight
+                color: '#69707a'
             }
         }
 
-
-
-        QxTreeView {
-            id: tree_view
-
-            Layout.fillHeight: true
-            Layout.fillWidth: true
-
-            clip: true
-
-            background: Rectangle {
-                color: 'orange'
-            }
-
-            model: example_model
-            delegate: Rectangle {
-                implicitHeight: text_item.implicitHeight
-                implicitWidth: text_item.implicitWidth
-
-                color: isHovered ? 'gray' : 'transparent'
-
-                Text {
-                    id: text_item
-                    padding: 16
-                    text: !!modelData.displayText ? modelData.displayText : ''
-                    width: parent.width
+        header: QxHorizontalHeaderView {
+            delegate: Control {
+                background:  Rectangle {
+                    color: '#f9fafc'
+                }
+                contentItem: Text {
+                    padding: 8
+                    text: !!sectionData ? sectionData.title : ''
                     elide: Text.ElideRight
+                    color: '#697283'
+                    font.bold: true
                 }
             }
-
-            header: QxHorizontalHeaderView {
-                id: header_view
-                delegate: header_delegate_component
-                syncView: tree_view
-                model: example_model
-                defaultColumnWidth: tree_view.width / columnCount
-                handleDelegate: handle_delegate_component
+            syncView: tree_view
+            model: example_model
+            handleDelegate: Item {
+                Rectangle {
+                    width: 1
+                    height: parent.height - 12
+                    anchors.centerIn: parent
+                    color: '#eeeff3'
+                }
             }
         }
     }

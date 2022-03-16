@@ -18,7 +18,6 @@ int main(int argc, char **argv)
     application.setApplicationDisplayName(QObject::tr("Qt treeview example"));
     application.setApplicationVersion("1.0.0");
 
-    qmlRegisterType<QFileSystemModel>("Example", 1, 0, "FileSystemModel");
     qmlRegisterType<TreeItemModel>("Example", 1, 0, "ExampleTreeItemModel");
 
     QFileSystemModel *fs_model = new QFileSystemModel;

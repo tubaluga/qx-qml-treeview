@@ -6,7 +6,7 @@
 #include "qxtreeviewmodeldata.h"
 #include "qxquicktreeviewrowtemplate.h"
 #include "qxtreeviewsectionmodeldata.h"
-#include "qxtreeviewtemplate.h"
+#include "qxquicktreeviewtemplate.h"
 
 #include <QtQml>
 
@@ -14,7 +14,10 @@ void QxTreeViewPlugin::registerTypes(const char *uri)
 {
     qmlRegisterType(QUrl("qrc:/qx-qml-treeview/QxTreeView.qml"), uri, 1, 0, "QxTreeView");
     qmlRegisterType(QUrl("qrc:/qx-qml-treeview/QxHorizontalHeaderView.qml"), uri, 1, 0, "QxHorizontalHeaderView");
-    qmlRegisterType<QxTreeViewTemplate>(uri, 1, 0, "QxTreeViewTemplate");
+
+    qmlRegisterType<QxQuickTreeViewTemplate>(uri, 1, 0, "QxTreeViewTemplate");
+    qmlRegisterType<QxQuickTreeViewColumnModel>(uri, 1, 0, "QxQuickTreeViewColumnModel");
+
     qmlRegisterType<QxHorizontalHeaderViewTemplate>(uri, 1, 0, "QxHorizontalHeaderViewTemplate");
     qmlRegisterType<QxQuickTreeViewRowTemplate>(uri, 1, 0, "QxTreeViewRowDelegateTemplate");
     qmlRegisterType<QxQuickTreeViewCellTemplate>(uri, 1, 0, "QxTreeViewCellDelegateTemplate");

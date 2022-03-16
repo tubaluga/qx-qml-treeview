@@ -2,32 +2,28 @@
 
 #include <QQuickItem>
 
-#include "qxtreeviewtemplate.h"
+#include "qxquicktreeviewtemplate.h"
 
 class QxQuickTreeViewRowTemplate : public QQuickItem {
     Q_OBJECT
     Q_DISABLE_COPY(QxQuickTreeViewRowTemplate)
 
-    Q_PROPERTY(QxTreeViewTemplate *view READ view WRITE setView NOTIFY viewChanged)
-    Q_PROPERTY(int columnCount READ columnCount NOTIFY columnCountChanged)
+    Q_PROPERTY(QxQuickTreeViewTemplate *view READ view WRITE setView NOTIFY viewChanged)
 
 public:
     explicit QxQuickTreeViewRowTemplate(QQuickItem *parent = nullptr);
 
-    QxTreeViewTemplate *view() const;
-    void setView(QxTreeViewTemplate *newView);
-
-    int columnCount() const;
+    QxQuickTreeViewTemplate *view() const;
+    void setView(QxQuickTreeViewTemplate *newView);
 
 private:
     void didModelChanged();
 
 signals:
     void viewChanged();
-    void columnCountChanged();
 
 private:
-    QPointer<QxTreeViewTemplate> m_view;
+    QPointer<QxQuickTreeViewTemplate> m_view;
     QMetaObject::Connection m_modelChangedConnection;
 };
 

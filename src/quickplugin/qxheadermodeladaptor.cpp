@@ -126,7 +126,11 @@ void QxHeaderModelAdaptor::invalidate()
 {
     foreach (auto section, m_sections) {
         section->invalidate();
-    }    
+
+        if (section->isLeaf() && section->width() < 1) {
+            section->setWidth(sectionDefaultWidth());
+        }
+    }
 }
 
 int QxHeaderModelAdaptor::sectionColumn(QxHeaderSection *section) const
