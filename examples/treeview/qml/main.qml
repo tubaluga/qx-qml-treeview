@@ -50,8 +50,15 @@ ApplicationWindow {
         header: QxHorizontalHeaderView {
             columnsWidth: control.width / columnCount
 
+            width: tree_view.width
+
+            background: Rectangle {
+                color: '#f9fafc'
+                opacity: 0.4
+            }
+
             delegate: Control {
-                background:  Rectangle {
+                background: Rectangle {
                     color: '#f9fafc'
                 }
                 contentItem: Text {
