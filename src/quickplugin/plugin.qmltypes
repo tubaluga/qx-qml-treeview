@@ -582,10 +582,10 @@ Module {
         }
     }
     Component {
-        name: "QxTreeViewCellDelegateTemplate"
+        name: "QxTreeViewCellTemplate"
         defaultProperty: "data"
         prototype: "QQuickItem"
-        exports: ["Qx.treeview/QxTreeViewCellDelegateTemplate 1.0"]
+        exports: ["Qx.treeview/QxTreeViewCellTemplate 1.0"]
         exportMetaObjectRevisions: [0]
     }
     Component {

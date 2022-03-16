@@ -25,12 +25,12 @@ QxTreeViewRowDelegateTemplate {
 
                 property int row_index: index
 
-                delegate: QxTreeViewCellDelegateTemplate {
+                delegate: QxTreeViewCellTemplate {
                     id: cell_item
 
                     QxTreeViewModelData {
                         id: model_data
-                        modelIndex: control.view.adaptor.mapRowToModelIndex(cell_repeater.row_index, index)
+                        modelIndex: control.adaptor.mapRowToModelIndex(cell_repeater.row_index, index)
                     }                  
 
                     width: {
@@ -69,7 +69,7 @@ QxTreeViewRowDelegateTemplate {
         propagateComposedEvents: true
         onClicked: {
 
-            var adaptor = control.view.adaptor
+            var adaptor = control.adaptor
 
             var model_index = adaptor.mapRowToModelIndex(index)
 

@@ -19,4 +19,11 @@ void QxQuickTreeViewRowTemplate::setView(QxQuickTreeViewTemplate *newView)
     m_view = newView;
 
     emit viewChanged();
+
+    emit adaptorChanged();
+}
+
+QxQuickTreeModelAdaptor *QxQuickTreeViewRowTemplate::adaptor() const
+{
+    return m_view.isNull() ? nullptr : m_view->adaptor();
 }

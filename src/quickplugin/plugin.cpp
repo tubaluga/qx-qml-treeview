@@ -20,7 +20,7 @@ void QxTreeViewPlugin::registerTypes(const char *uri)
 
     qmlRegisterType<QxHorizontalHeaderViewTemplate>(uri, 1, 0, "QxHorizontalHeaderViewTemplate");
     qmlRegisterType<QxQuickTreeViewRowTemplate>(uri, 1, 0, "QxTreeViewRowDelegateTemplate");
-    qmlRegisterType<QxQuickTreeViewCellTemplate>(uri, 1, 0, "QxTreeViewCellDelegateTemplate");
+    qmlRegisterType<QxQuickTreeViewCellTemplate>(uri, 1, 0, "QxTreeViewCellTemplate");
     qmlRegisterUncreatableType<QxTreeViewSectionModelData>(uri, 1, 0, "QxTreeViewSectionModelData", "This is the inner data class");
     qmlRegisterType<QxTreeViewModelData>(uri, 1, 0, "QxTreeViewModelData");
     qmlRegisterType<QxHeaderSection>(uri, 1, 0, "QxHeaderSection");
