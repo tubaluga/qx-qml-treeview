@@ -15,9 +15,9 @@ ApplicationWindow {
 
     ExampleTreeItemModel {
         id: example_model
-    }
 
-    Component.onCompleted: example_model.populate()
+        Component.onCompleted: example_model.populate()
+    }
 
     QxTreeView {
         id: tree_view
@@ -34,8 +34,6 @@ ApplicationWindow {
         model: exampleModel
         delegate: Control {
 
-            implicitWidth: 200
-
             background: Rectangle {
                 color: isHovered ? '#f9fafc' : 'transparent'
             }
@@ -50,6 +48,8 @@ ApplicationWindow {
         }
 
         header: QxHorizontalHeaderView {
+            columnsWidth: control.width / columnCount
+
             delegate: Control {
                 background:  Rectangle {
                     color: '#f9fafc'

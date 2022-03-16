@@ -1,16 +1,16 @@
-#include "qxhorizontalheaderviewtemplate.h"
-#include "qxheadersyncviewmodeladaptor.h"
-#include "qxheadertreemodeladaptor.h"
+#include "qxquickhorizontalheaderviewtemplate.h"
+#include "qxquickheadersyncviewmodeladaptor.h"
+#include "qxquickheadertreemodeladaptor.h"
 #include "qxquicktreeviewtemplate.h"
 
 #include <QQmlContext>
 #include <QQmlEngine>
 
-class QxHorizontalHeaderViewTemplatePrivate {
-    Q_DECLARE_PUBLIC(QxHorizontalHeaderViewTemplate)
+class QxQuickHorizontalHeaderViewTemplatePrivate {
+    Q_DECLARE_PUBLIC(QxQuickHorizontalHeaderViewTemplate)
 
 public:
-    QxHorizontalHeaderViewTemplatePrivate(QxHorizontalHeaderViewTemplate *parent) :
+    QxQuickHorizontalHeaderViewTemplatePrivate(QxQuickHorizontalHeaderViewTemplate *parent) :
         q_ptr(parent)
     {
     }
@@ -21,12 +21,12 @@ public:
             QObject::disconnect(connection);
         }
 
-        adaptor_connections << QObject::connect(adaptor, &QxHeaderModelAdaptor::sectionColumnCountChanged, q_ptr, [this]() {
+        adaptor_connections << QObject::connect(adaptor, &QxQuickHeaderModelAdaptor::sectionColumnCountChanged, q_ptr, [this]() {
             q_ptr->setColumnCount(adaptor->sectionColumnCount());
             updateDefaultColumnWidth();
         });
 
-        adaptor_connections << QObject::connect(adaptor, &QxHeaderModelAdaptor::sectionRowCountChanged, q_ptr, [this]() {
+        adaptor_connections << QObject::connect(adaptor, &QxQuickHeaderModelAdaptor::sectionRowCountChanged, q_ptr, [this]() {
             q_ptr->setRowCount(adaptor->sectionRowCount());
             updateDefaultColumnWidth();
         });
@@ -46,7 +46,7 @@ public:
     void setSyncViewModel()
     {
         if (q_ptr->model() == nullptr) {
-            auto adaptor = new QxHeaderSyncViewModelAdaptor(q_ptr);
+            auto adaptor = new QxQuickHeaderSyncViewModelAdaptor(q_ptr);
             q_ptr->setAdaptor(adaptor);
 
             if (sync_view) {
@@ -69,14 +69,18 @@ public:
 
     void updateDefaultColumnWidth()
     {
-        /*if (default_column_width < 1 && sync_view) {
-            int defautl_width = sync_view->width() / q_ptr->columnCount();
-            q_ptr->setDefaultColumnWidth(defautl_width);
+        /*static qreal minimum_width = 25.;
+
+        if (q_ptr->columnCount() == 0) {
+            q_ptr->setDefaultColumnWidth(250);
+        }
+        else {
+            q_ptr->setDefaultColumnWidth(qMax(q_ptr->width() / q_ptr->columnCount(), minimum_width));
         }*/
     }
 
-    QxHeaderModelAdaptor *adaptor         = nullptr;
-    QxHorizontalHeaderViewTemplate *q_ptr = nullptr;
+    QxQuickHeaderModelAdaptor *adaptor         = nullptr;
+    QxQuickHorizontalHeaderViewTemplate *q_ptr = nullptr;
     int row_count                         = 0;
     int column_count                      = 0;
     QPointer<QxQuickTreeViewTemplate> sync_view;
@@ -86,20 +90,20 @@ public:
     QVector<QMetaObject::Connection> header_view_connections;
 };
 
-QxHorizontalHeaderViewTemplate::QxHorizontalHeaderViewTemplate(QQuickItem *parent) :
-    QxHeaderViewTemplate(parent), d_ptr(new QxHorizontalHeaderViewTemplatePrivate(this))
+QxQuickHorizontalHeaderViewTemplate::QxQuickHorizontalHeaderViewTemplate(QQuickItem *parent) :
+    QxQuickHeaderViewTemplate(parent), d_ptr(new QxQuickHorizontalHeaderViewTemplatePrivate(this))
 {
-    setZ(2);
+    setZ(2);    
 }
 
-QxHorizontalHeaderViewTemplate::~QxHorizontalHeaderViewTemplate()
+QxQuickHorizontalHeaderViewTemplate::~QxQuickHorizontalHeaderViewTemplate()
 {
     delete d_ptr;
 }
 
-void QxHorizontalHeaderViewTemplate::setupModel(QAbstractItemModel *new_model, QAbstractItemModel *old_model)
+void QxQuickHorizontalHeaderViewTemplate::setupModel(QAbstractItemModel *new_model, QAbstractItemModel *old_model)
 {
-    auto tree_adaptor = new QxHeaderTreeModelAdaptor(this);
+    auto tree_adaptor = new QxQuickHeaderTreeModelAdaptor(this);
 
     tree_adaptor->setSource(model());
 
@@ -108,12 +112,12 @@ void QxHorizontalHeaderViewTemplate::setupModel(QAbstractItemModel *new_model, Q
     d_ptr->syncSectionWidth();
 }
 
-int QxHorizontalHeaderViewTemplate::columnCount() const
+int QxQuickHorizontalHeaderViewTemplate::columnCount() const
 {
     return d_ptr->column_count;
 }
 
-void QxHorizontalHeaderViewTemplate::setColumnCount(int newColumnCount)
+void QxQuickHorizontalHeaderViewTemplate::setColumnCount(int newColumnCount)
 {
     if (d_ptr->column_count == newColumnCount) {
         return;
@@ -123,7 +127,7 @@ void QxHorizontalHeaderViewTemplate::setColumnCount(int newColumnCount)
     emit columnCountChanged();
 }
 
-void QxHorizontalHeaderViewTemplate::setAdaptor(QxHeaderModelAdaptor *adaptor)
+void QxQuickHorizontalHeaderViewTemplate::setAdaptor(QxQuickHeaderModelAdaptor *adaptor)
 {
     if (d_ptr->adaptor == adaptor) {
         return;
@@ -138,7 +142,7 @@ void QxHorizontalHeaderViewTemplate::setAdaptor(QxHeaderModelAdaptor *adaptor)
     }
 
     d_ptr->adaptor = adaptor;
-    d_ptr->adaptor->setSectionDefaultWidth(defaultColumnWidth());
+    d_ptr->adaptor->setSectionDefaultWidth(columnsWidth());
 
     setColumnCount(d_ptr->adaptor->sectionColumnCount());
     setRowCount(d_ptr->adaptor->sectionRowCount());
@@ -147,11 +151,11 @@ void QxHorizontalHeaderViewTemplate::setAdaptor(QxHeaderModelAdaptor *adaptor)
 
     emit adaptorChanged();
 
-    d_ptr->header_view_connections << connect(this, &QxHorizontalHeaderViewTemplate::defaultColumnWidthChanged, d_ptr->adaptor, [this]() {
-        d_ptr->adaptor->setSectionDefaultWidth(defaultColumnWidth());
+    d_ptr->header_view_connections << connect(this, &QxQuickHorizontalHeaderViewTemplate::columnsWidthChanged, d_ptr->adaptor, [this]() {
+        d_ptr->adaptor->setSectionDefaultWidth(columnsWidth());
     });
 
-    d_ptr->header_view_connections << connect(adaptor, &QxHeaderModelAdaptor::sectionWidthChanged, this, [this](int section, qreal width) {
+    d_ptr->header_view_connections << connect(adaptor, &QxQuickHeaderModelAdaptor::sectionWidthChanged, this, [this](int section, qreal width) {
         if (syncView()) {
             syncView()->setColumnWidth(section, width);
         }
@@ -160,12 +164,12 @@ void QxHorizontalHeaderViewTemplate::setAdaptor(QxHeaderModelAdaptor *adaptor)
     d_ptr->updateDefaultColumnWidth();
 }
 
-qreal QxHorizontalHeaderViewTemplate::defaultColumnWidth() const
+qreal QxQuickHorizontalHeaderViewTemplate::columnsWidth() const
 {
     return d_ptr->default_column_width;
 }
 
-void QxHorizontalHeaderViewTemplate::setDefaultColumnWidth(qreal newDefaultColumnWidth)
+void QxQuickHorizontalHeaderViewTemplate::setColumnsWidth(qreal newDefaultColumnWidth)
 {
     if (d_ptr->default_column_width == newDefaultColumnWidth) {
         return;
@@ -177,15 +181,22 @@ void QxHorizontalHeaderViewTemplate::setDefaultColumnWidth(qreal newDefaultColum
         d_ptr->adaptor->setSectionDefaultWidth(newDefaultColumnWidth);
     }
 
-    emit defaultColumnWidthChanged();
+    emit columnsWidthChanged();
 }
 
-QxQuickTreeViewTemplate *QxHorizontalHeaderViewTemplate::syncView() const
+void QxQuickHorizontalHeaderViewTemplate::setColumnWidth(int section, qreal width)
+{
+    if (d_ptr->adaptor) {
+        d_ptr->adaptor->setColumnWidth(section, width);
+    }
+}
+
+QxQuickTreeViewTemplate *QxQuickHorizontalHeaderViewTemplate::syncView() const
 {
     return d_ptr->sync_view;
 }
 
-void QxHorizontalHeaderViewTemplate::setSyncView(QxQuickTreeViewTemplate *newSyncView)
+void QxQuickHorizontalHeaderViewTemplate::setSyncView(QxQuickTreeViewTemplate *newSyncView)
 {
     if (d_ptr->sync_view == newSyncView) {
         return;
@@ -203,12 +214,12 @@ void QxHorizontalHeaderViewTemplate::setSyncView(QxQuickTreeViewTemplate *newSyn
     emit syncViewChanged();
 }
 
-int QxHorizontalHeaderViewTemplate::rowCount() const
+int QxQuickHorizontalHeaderViewTemplate::rowCount() const
 {
     return d_ptr->row_count;
 }
 
-void QxHorizontalHeaderViewTemplate::setRowCount(int newRowCount)
+void QxQuickHorizontalHeaderViewTemplate::setRowCount(int newRowCount)
 {
     if (d_ptr->row_count == newRowCount) {
         return;
@@ -218,7 +229,7 @@ void QxHorizontalHeaderViewTemplate::setRowCount(int newRowCount)
     emit rowCountChanged();
 }
 
-QxHeaderModelAdaptor *QxHorizontalHeaderViewTemplate::adaptor() const
+QxQuickHeaderModelAdaptor *QxQuickHorizontalHeaderViewTemplate::adaptor() const
 {
     return d_ptr->adaptor;
 }

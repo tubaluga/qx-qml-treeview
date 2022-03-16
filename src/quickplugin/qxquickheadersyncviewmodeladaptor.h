@@ -1,11 +1,11 @@
 #pragma once
 
-#include "qxheadermodeladaptor.h"
+#include "qxquickheadermodeladaptor.h"
 
-class QxHeaderSyncViewModelAdaptor : public QxHeaderModelAdaptor {
+class QxQuickHeaderSyncViewModelAdaptor : public QxQuickHeaderModelAdaptor {
     Q_OBJECT
 public:
-    explicit QxHeaderSyncViewModelAdaptor(QObject *parent = nullptr);
+    explicit QxQuickHeaderSyncViewModelAdaptor(QObject *parent = nullptr);
 
 private:
     void createSections();

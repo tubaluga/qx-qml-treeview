@@ -1,15 +1,15 @@
-#include "qxheadertreemodeladaptor.h"
+#include "qxquickheadertreemodeladaptor.h"
 
-QxHeaderTreeModelAdaptor::QxHeaderTreeModelAdaptor(QObject *parent) :
-    QxHeaderModelAdaptor{ parent }
+QxQuickHeaderTreeModelAdaptor::QxQuickHeaderTreeModelAdaptor(QObject *parent) :
+    QxQuickHeaderModelAdaptor{ parent }
 {
 }
 
-void QxHeaderTreeModelAdaptor::createSections()
+void QxQuickHeaderTreeModelAdaptor::createSections()
 {
     m_sectionCache.clear();
 
-    QList<QxHeaderSection *> section_list;
+    QList<QxQuickHeaderSection *> section_list;
     createSectionsByRow(section_list, source(), QModelIndex(), nullptr);
 
     setSections(section_list);
@@ -19,12 +19,12 @@ void QxHeaderTreeModelAdaptor::createSections()
     updateColumnSize();
 }
 
-void QxHeaderTreeModelAdaptor::createSectionsByRow(QList<QxHeaderSection *> &root_sections, QAbstractItemModel *model, const QModelIndex &index, QxHeaderSection *parent_section)
+void QxQuickHeaderTreeModelAdaptor::createSectionsByRow(QList<QxQuickHeaderSection *> &root_sections, QAbstractItemModel *model, const QModelIndex &index, QxQuickHeaderSection *parent_section)
 {
     for (int row = 0; row < model->rowCount(index); ++row) {
         auto child_index = model->index(row, 0, index);
 
-        QxHeaderSection *section = new QxHeaderSection(parent_section);
+        QxQuickHeaderSection *section = new QxQuickHeaderSection(parent_section);
         section->setTitle(model->data(child_index).toString());
 
         m_sectionCache.insert(child_index, section);
@@ -42,7 +42,7 @@ void QxHeaderTreeModelAdaptor::createSectionsByRow(QList<QxHeaderSection *> &roo
     }
 }
 
-void QxHeaderTreeModelAdaptor::onSourceModelChanged(QAbstractItemModel *new_model, QAbstractItemModel *old_model)
+void QxQuickHeaderTreeModelAdaptor::onSourceModelChanged(QAbstractItemModel *new_model, QAbstractItemModel *old_model)
 {
     Q_UNUSED(new_model)
     Q_UNUSED(old_model)
@@ -54,7 +54,7 @@ void QxHeaderTreeModelAdaptor::onSourceModelChanged(QAbstractItemModel *new_mode
     if (source()) {
         createSections();
 
-        m_connections << QObject::connect(source(), &QAbstractListModel::modelReset, this, &QxHeaderTreeModelAdaptor::createSections);
+        m_connections << QObject::connect(source(), &QAbstractListModel::modelReset, this, &QxQuickHeaderTreeModelAdaptor::createSections);
         m_connections << QObject::connect(source(), &QAbstractListModel::dataChanged, this, [this](const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles) {
             Q_UNUSED(bottomRight)
             Q_UNUSED(roles)

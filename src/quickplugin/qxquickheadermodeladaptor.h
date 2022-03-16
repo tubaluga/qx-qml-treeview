@@ -3,9 +3,9 @@
 #include <QAbstractListModel>
 #include <QPointer>
 
-#include "qxheadersection.h"
+#include "qxquickheadersection.h"
 
-class QxHeaderModelAdaptor : public QAbstractListModel {
+class QxQuickHeaderModelAdaptor : public QAbstractListModel {
     Q_OBJECT
 
     Q_PROPERTY(QAbstractItemModel *source READ source WRITE setSource NOTIFY sourceChanged)
@@ -30,21 +30,21 @@ public:
 
     Q_ENUM(Role)
 
-    explicit QxHeaderModelAdaptor(QObject *parent = nullptr);
+    explicit QxQuickHeaderModelAdaptor(QObject *parent = nullptr);
 
     QAbstractItemModel *source() const;
     void setSource(QAbstractItemModel *newSource);
 
-    void setSections(const QList<QxHeaderSection *> &newSections);
+    void setSections(const QList<QxQuickHeaderSection *> &newSections);
 
     int rowCount(const QModelIndex &parent) const override;
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
     QHash<int, QByteArray> roleNames() const override;
 
-    QxHeaderSection *root() const;
-    void setRoot(QxHeaderSection *newRoot);
+    QxQuickHeaderSection *root() const;
+    void setRoot(QxQuickHeaderSection *newRoot);
 
-    Q_INVOKABLE void addSectionWidthOffset(QxHeaderSection *section, qreal offset);
+    Q_INVOKABLE void addSectionWidthOffset(QxQuickHeaderSection *section, qreal offset);
 
     int sectionColumnCount() const;
 
@@ -53,9 +53,12 @@ public:
     qreal sectionDefaultWidth() const;
     void setSectionDefaultWidth(qreal newSectionDefaultWidth);
 
+    void setColumnsWidth(qreal width);
+    void setColumnWidth(int section, qreal width);
+
 protected:
     void invalidate();
-    int sectionColumn(QxHeaderSection *section) const;
+    int sectionColumn(QxQuickHeaderSection *section) const;
     virtual void onSourceModelChanged(QAbstractItemModel *new_model, QAbstractItemModel *old_model);
     void updateColumnSize();
     void setSectionColumnCount(int newSectionColumnCount);
@@ -69,8 +72,8 @@ signals:
 
 private:
     QPointer<QAbstractItemModel> m_source;
-    QxHeaderSection *m_root;
-    QList<QxHeaderSection *> m_sections;
+    QxQuickHeaderSection *m_root;
+    QList<QxQuickHeaderSection *> m_sections;
     QList<QMetaObject::Connection> m_connections;
     int m_sectionColumnCount = 0;
     int m_sectionRowCount    = 0;

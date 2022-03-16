@@ -1,18 +1,18 @@
-#include "qxheadermodeladaptor.h"
+#include "qxquickheadermodeladaptor.h"
 
-QxHeaderModelAdaptor::QxHeaderModelAdaptor(QObject *parent) :
+QxQuickHeaderModelAdaptor::QxQuickHeaderModelAdaptor(QObject *parent) :
     QAbstractListModel{ parent }
 {
-    m_root = new QxHeaderSection(this);
+    m_root = new QxQuickHeaderSection(this);
     m_root->setTitle("adaptor_root");
 }
 
-QAbstractItemModel *QxHeaderModelAdaptor::source() const
+QAbstractItemModel *QxQuickHeaderModelAdaptor::source() const
 {
     return m_source;
 }
 
-void QxHeaderModelAdaptor::setSource(QAbstractItemModel *newSource)
+void QxQuickHeaderModelAdaptor::setSource(QAbstractItemModel *newSource)
 {
     if (m_source == newSource) {
         return;
@@ -26,7 +26,7 @@ void QxHeaderModelAdaptor::setSource(QAbstractItemModel *newSource)
     emit sourceChanged();
 }
 
-void QxHeaderModelAdaptor::setSections(const QList<QxHeaderSection *> &newSections)
+void QxQuickHeaderModelAdaptor::setSections(const QList<QxQuickHeaderSection *> &newSections)
 {
     m_root->clearSections();
     m_sections.clear();
@@ -35,7 +35,7 @@ void QxHeaderModelAdaptor::setSections(const QList<QxHeaderSection *> &newSectio
         m_root->appendSection(sec);
     }
 
-    std::function<void(QxHeaderSection * section)> tree_visitor = [&tree_visitor, this](QxHeaderSection *section) {
+    std::function<void(QxQuickHeaderSection * section)> tree_visitor = [&tree_visitor, this](QxQuickHeaderSection *section) {
         for (int i = 0; i < section->sections().size(); ++i) {
             auto s = section->sections().at(i);
 
@@ -56,7 +56,7 @@ void QxHeaderModelAdaptor::setSections(const QList<QxHeaderSection *> &newSectio
     }
 
     foreach (auto column_section, m_root->leafs()) {
-        m_connections << connect(column_section, &QxHeaderSection::widthChanged, this, [column_section, this]() {
+        m_connections << connect(column_section, &QxQuickHeaderSection::widthChanged, this, [column_section, this]() {
             emit sectionWidthChanged(column_section->column(), column_section->width());
         });
     }
@@ -72,12 +72,12 @@ void QxHeaderModelAdaptor::setSections(const QList<QxHeaderSection *> &newSectio
     updateColumnSize();
 }
 
-int QxHeaderModelAdaptor::rowCount(const QModelIndex &parent) const
+int QxQuickHeaderModelAdaptor::rowCount(const QModelIndex &parent) const
 {
     return m_sections.size();
 }
 
-QVariant QxHeaderModelAdaptor::data(const QModelIndex &index, int role) const
+QVariant QxQuickHeaderModelAdaptor::data(const QModelIndex &index, int role) const
 {
     if (!index.isValid() && index.model() != this) {
         return QVariant();
@@ -107,7 +107,7 @@ QVariant QxHeaderModelAdaptor::data(const QModelIndex &index, int role) const
     return QVariant();
 }
 
-QHash<int, QByteArray> QxHeaderModelAdaptor::roleNames() const
+QHash<int, QByteArray> QxQuickHeaderModelAdaptor::roleNames() const
 {
     QHash<int, QByteArray> roles;
 
@@ -122,7 +122,7 @@ QHash<int, QByteArray> QxHeaderModelAdaptor::roleNames() const
     return roles;
 }
 
-void QxHeaderModelAdaptor::invalidate()
+void QxQuickHeaderModelAdaptor::invalidate()
 {
     foreach (auto section, m_sections) {
         section->invalidate();
@@ -133,14 +133,14 @@ void QxHeaderModelAdaptor::invalidate()
     }
 }
 
-int QxHeaderModelAdaptor::sectionColumn(QxHeaderSection *section) const
+int QxQuickHeaderModelAdaptor::sectionColumn(QxQuickHeaderSection *section) const
 {
     int depth = section->depth();
 
     int column = 0;
     bool find  = false;
 
-    std::function<void(QxHeaderSection * section)> tree_visitor = [&tree_visitor, depth, &column, section, &find](QxHeaderSection *v_section) {
+    std::function<void(QxQuickHeaderSection * section)> tree_visitor = [&tree_visitor, depth, &column, section, &find](QxQuickHeaderSection *v_section) {
         if (find) {
             return;
         }
@@ -166,13 +166,13 @@ int QxHeaderModelAdaptor::sectionColumn(QxHeaderSection *section) const
     return column;
 }
 
-void QxHeaderModelAdaptor::onSourceModelChanged(QAbstractItemModel *new_model, QAbstractItemModel *old_model)
+void QxQuickHeaderModelAdaptor::onSourceModelChanged(QAbstractItemModel *new_model, QAbstractItemModel *old_model)
 {
     Q_UNUSED(new_model)
     Q_UNUSED(old_model)
 }
 
-void QxHeaderModelAdaptor::updateColumnSize()
+void QxQuickHeaderModelAdaptor::updateColumnSize()
 {
     auto leaf_sections = root()->leafs();
 
@@ -181,12 +181,12 @@ void QxHeaderModelAdaptor::updateColumnSize()
     }
 }
 
-int QxHeaderModelAdaptor::sectionRowCount() const
+int QxQuickHeaderModelAdaptor::sectionRowCount() const
 {
     return m_sectionRowCount;
 }
 
-void QxHeaderModelAdaptor::setSectionRowCount(int newSectionRowCount)
+void QxQuickHeaderModelAdaptor::setSectionRowCount(int newSectionRowCount)
 {
     if (m_sectionRowCount == newSectionRowCount) {
         return;
@@ -196,12 +196,12 @@ void QxHeaderModelAdaptor::setSectionRowCount(int newSectionRowCount)
     emit sectionRowCountChanged();
 }
 
-qreal QxHeaderModelAdaptor::sectionDefaultWidth() const
+qreal QxQuickHeaderModelAdaptor::sectionDefaultWidth() const
 {
     return m_sectionDefaultWidth;
 }
 
-void QxHeaderModelAdaptor::setSectionDefaultWidth(qreal newSectionDefaultWidth)
+void QxQuickHeaderModelAdaptor::setSectionDefaultWidth(qreal newSectionDefaultWidth)
 {
     if (m_sectionDefaultWidth == newSectionDefaultWidth) {
         return;
@@ -209,19 +209,33 @@ void QxHeaderModelAdaptor::setSectionDefaultWidth(qreal newSectionDefaultWidth)
 
     m_sectionDefaultWidth = newSectionDefaultWidth;
 
+    setColumnsWidth(m_sectionDefaultWidth);
+}
+
+void QxQuickHeaderModelAdaptor::setColumnsWidth(qreal width)
+{
     foreach (auto section, m_sections) {
-        if (section->isLeaf() && section->width() < 1) {
-            section->setWidth(sectionDefaultWidth());
+        if (section->isLeaf()) {
+            section->setWidth(width);
         }
     }
 }
 
-int QxHeaderModelAdaptor::sectionColumnCount() const
+void QxQuickHeaderModelAdaptor::setColumnWidth(int section, qreal width)
+{
+    auto leaf_sections = root()->leafs();
+
+    if (section > -1 && section < leaf_sections.size()) {
+        leaf_sections.at(section)->setWidth(width);
+    }
+}
+
+int QxQuickHeaderModelAdaptor::sectionColumnCount() const
 {
     return m_sectionColumnCount;
 }
 
-void QxHeaderModelAdaptor::setSectionColumnCount(int newSectionColumnCount)
+void QxQuickHeaderModelAdaptor::setSectionColumnCount(int newSectionColumnCount)
 {
     if (m_sectionColumnCount == newSectionColumnCount)
         return;
@@ -229,19 +243,19 @@ void QxHeaderModelAdaptor::setSectionColumnCount(int newSectionColumnCount)
     emit sectionColumnCountChanged();
 }
 
-QxHeaderSection *QxHeaderModelAdaptor::root() const
+QxQuickHeaderSection *QxQuickHeaderModelAdaptor::root() const
 {
     return m_root;
 }
 
-void QxHeaderModelAdaptor::setRoot(QxHeaderSection *newRoot)
+void QxQuickHeaderModelAdaptor::setRoot(QxQuickHeaderSection *newRoot)
 {
     m_root = newRoot;
 
     setSections(m_root->sections());
 }
 
-void QxHeaderModelAdaptor::addSectionWidthOffset(QxHeaderSection *section, qreal offset)
+void QxQuickHeaderModelAdaptor::addSectionWidthOffset(QxQuickHeaderSection *section, qreal offset)
 {
     static qreal minimum_column_width = 25;
 

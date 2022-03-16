@@ -1,11 +1,11 @@
-#include "qxheadersyncviewmodeladaptor.h"
+#include "qxquickheadersyncviewmodeladaptor.h"
 
-QxHeaderSyncViewModelAdaptor::QxHeaderSyncViewModelAdaptor(QObject *parent) :
-    QxHeaderModelAdaptor{ parent }
+QxQuickHeaderSyncViewModelAdaptor::QxQuickHeaderSyncViewModelAdaptor(QObject *parent) :
+    QxQuickHeaderModelAdaptor{ parent }
 {
 }
 
-void QxHeaderSyncViewModelAdaptor::createSections()
+void QxQuickHeaderSyncViewModelAdaptor::createSections()
 {
     auto source_model = source();
 
@@ -13,10 +13,10 @@ void QxHeaderSyncViewModelAdaptor::createSections()
         return;
     }
 
-    QList<QxHeaderSection *> section_list;
+    QList<QxQuickHeaderSection *> section_list;
 
     for (int col = 0; col < source_model->columnCount(); ++col) {
-        QxHeaderSection *section = new QxHeaderSection();
+        QxQuickHeaderSection *section = new QxQuickHeaderSection();
         section->setTitle(source_model->headerData(col, Qt::Horizontal).toString());
 
         auto header_width = source_model->headerData(col, Qt::Horizontal, Qt::EditRole);
@@ -35,7 +35,7 @@ void QxHeaderSyncViewModelAdaptor::createSections()
     updateColumnSize();
 }
 
-void QxHeaderSyncViewModelAdaptor::onSourceModelChanged(QAbstractItemModel *new_model, QAbstractItemModel *old_model)
+void QxQuickHeaderSyncViewModelAdaptor::onSourceModelChanged(QAbstractItemModel *new_model, QAbstractItemModel *old_model)
 {
     Q_UNUSED(new_model)
     Q_UNUSED(old_model)

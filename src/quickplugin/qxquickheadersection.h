@@ -1,9 +1,9 @@
 #pragma once
 
-#include <QList>
-#include <QQuickItem>
+#include <QObject>
+#include <QQmlListProperty>
 
-class QxHeaderSection : public QObject {
+class QxQuickHeaderSection : public QObject {
     Q_OBJECT
 
     Q_PROPERTY(QString title READ title WRITE setTitle NOTIFY titleChanged)
@@ -14,16 +14,16 @@ class QxHeaderSection : public QObject {
     Q_PROPERTY(int depth READ depth NOTIFY depthChanged)
     Q_PROPERTY(int column READ column WRITE setColumn NOTIFY columnChanged)
     Q_PROPERTY(int row READ row WRITE setRow NOTIFY rowChanged)
-    Q_PROPERTY(QQmlListProperty<QxHeaderSection> sections READ sectionListProperty CONSTANT)
+    Q_PROPERTY(QQmlListProperty<QxQuickHeaderSection> sections READ sectionListProperty CONSTANT)
 
 public:
-    explicit QxHeaderSection(QObject *parent = nullptr);
+    explicit QxQuickHeaderSection(QObject *parent = nullptr);
 
-    QQmlListProperty<QxHeaderSection> sectionListProperty();
+    QQmlListProperty<QxQuickHeaderSection> sectionListProperty();
 
-    void appendSection(QxHeaderSection *);
+    void appendSection(QxQuickHeaderSection *);
     int sectionCount();
-    QxHeaderSection *section(int);
+    QxQuickHeaderSection *section(int);
     void clearSections();
 
     const QString &title() const;
@@ -37,15 +37,15 @@ public:
     int depth() const;
     int maxChildrenDepth() const;
 
-    QList<QxHeaderSection *> leafs() const;
-    QList<QxHeaderSection *> depthSections(int depth) const;
+    QList<QxQuickHeaderSection *> leafs() const;
+    QList<QxQuickHeaderSection *> depthSections(int depth) const;
 
-    QxHeaderSection *parentSection() const;
-    void setParentSection(QxHeaderSection *newSectionParent);
+    QxQuickHeaderSection *parentSection() const;
+    void setParentSection(QxQuickHeaderSection *newSectionParent);
 
-    QxHeaderSection *rootSection() const;
+    QxQuickHeaderSection *rootSection() const;
 
-    const QList<QxHeaderSection *> &sections() const;
+    const QList<QxQuickHeaderSection *> &sections() const;
 
     int rowSpan() const;
     void setRowSpan(int newRowSpan);
@@ -63,7 +63,7 @@ public:
 
 protected:
     void resize();
-    QxHeaderSection *findFirstLeafSection();
+    QxQuickHeaderSection *findFirstLeafSection();
 
 signals:
     void titleChanged();
@@ -76,10 +76,10 @@ signals:
     void depthChanged();
 
 private:
-    static void appendSection(QQmlListProperty<QxHeaderSection> *, QxHeaderSection *);
-    static int sectionCount(QQmlListProperty<QxHeaderSection> *);
-    static QxHeaderSection *section(QQmlListProperty<QxHeaderSection> *, int);
-    static void clearSections(QQmlListProperty<QxHeaderSection> *);
+    static void appendSection(QQmlListProperty<QxQuickHeaderSection> *, QxQuickHeaderSection *);
+    static int sectionCount(QQmlListProperty<QxQuickHeaderSection> *);
+    static QxQuickHeaderSection *section(QQmlListProperty<QxQuickHeaderSection> *, int);
+    static void clearSections(QQmlListProperty<QxQuickHeaderSection> *);
 
 private:
     QString m_title;
@@ -88,8 +88,8 @@ private:
     int m_row                        = 0;
     int m_rowSpan                    = 1;
     int m_columnSpan                 = 1;
-    QxHeaderSection *m_parentSection = nullptr;
-    QList<QxHeaderSection *> m_sections;
+    QxQuickHeaderSection *m_parentSection = nullptr;
+    QList<QxQuickHeaderSection *> m_sections;
 };
 
-Q_DECLARE_METATYPE(QxHeaderSection *)
+Q_DECLARE_METATYPE(QxQuickHeaderSection *)

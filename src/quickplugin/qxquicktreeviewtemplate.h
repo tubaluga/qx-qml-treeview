@@ -5,7 +5,6 @@
 #include <QQuickItem>
 
 #include "qxquicktreeviewcolumnmodel.h"
-#include "qxtreeviewsectionmodeldata.h"
 
 class QxQuickTreeModelAdaptor;
 
@@ -23,7 +22,7 @@ public:
     QAbstractItemModel *model() const;
     void setModel(QAbstractItemModel *newModel);
 
-    Q_INVOKABLE void setColumnWidth(int column, qreal width);
+    void setColumnWidth(int column, qreal width);
 
     QxQuickTreeViewColumnModel *columnModel() const;
 

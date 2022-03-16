@@ -1,16 +1,16 @@
-#include "qxheadersection.h"
+#include "qxquickheadersection.h"
 
-QxHeaderSection::QxHeaderSection(QObject *parent) :
+QxQuickHeaderSection::QxQuickHeaderSection(QObject *parent) :
     QObject(parent)
 {
 }
 
-QQmlListProperty<QxHeaderSection> QxHeaderSection::sectionListProperty()
+QQmlListProperty<QxQuickHeaderSection> QxQuickHeaderSection::sectionListProperty()
 {
-    return { this, this, &QxHeaderSection::appendSection, &QxHeaderSection::sectionCount, &QxHeaderSection::section, &QxHeaderSection::clearSections };
+    return { this, this, &QxQuickHeaderSection::appendSection, &QxQuickHeaderSection::sectionCount, &QxQuickHeaderSection::section, &QxQuickHeaderSection::clearSections };
 }
 
-void QxHeaderSection::appendSection(QxHeaderSection *section)
+void QxQuickHeaderSection::appendSection(QxQuickHeaderSection *section)
 {
     section->setParentSection(this);
     m_sections.append(section);
@@ -20,17 +20,17 @@ void QxHeaderSection::appendSection(QxHeaderSection *section)
     section->invalidate();
 }
 
-int QxHeaderSection::sectionCount()
+int QxQuickHeaderSection::sectionCount()
 {
     return m_sections.size();
 }
 
-QxHeaderSection *QxHeaderSection::section(int index)
+QxQuickHeaderSection *QxQuickHeaderSection::section(int index)
 {
     return m_sections.at(index);
 }
 
-void QxHeaderSection::clearSections()
+void QxQuickHeaderSection::clearSections()
 {
     foreach (auto section, m_sections) {
         section->deleteLater();
@@ -38,32 +38,32 @@ void QxHeaderSection::clearSections()
     m_sections.clear();
 }
 
-void QxHeaderSection::appendSection(QQmlListProperty<QxHeaderSection> *list, QxHeaderSection *p)
+void QxQuickHeaderSection::appendSection(QQmlListProperty<QxQuickHeaderSection> *list, QxQuickHeaderSection *p)
 {
-    reinterpret_cast<QxHeaderSection *>(list->data)->appendSection(p);
+    reinterpret_cast<QxQuickHeaderSection *>(list->data)->appendSection(p);
 }
 
-int QxHeaderSection::sectionCount(QQmlListProperty<QxHeaderSection> *list)
+int QxQuickHeaderSection::sectionCount(QQmlListProperty<QxQuickHeaderSection> *list)
 {
-    return reinterpret_cast<QxHeaderSection *>(list->data)->sectionCount();
+    return reinterpret_cast<QxQuickHeaderSection *>(list->data)->sectionCount();
 }
 
-QxHeaderSection *QxHeaderSection::section(QQmlListProperty<QxHeaderSection> *list, int index)
+QxQuickHeaderSection *QxQuickHeaderSection::section(QQmlListProperty<QxQuickHeaderSection> *list, int index)
 {
-    return reinterpret_cast<QxHeaderSection *>(list->data)->section(index);
+    return reinterpret_cast<QxQuickHeaderSection *>(list->data)->section(index);
 }
 
-void QxHeaderSection::clearSections(QQmlListProperty<QxHeaderSection> *list)
+void QxQuickHeaderSection::clearSections(QQmlListProperty<QxQuickHeaderSection> *list)
 {
-    reinterpret_cast<QxHeaderSection *>(list->data)->clearSections();
+    reinterpret_cast<QxQuickHeaderSection *>(list->data)->clearSections();
 }
 
-int QxHeaderSection::row() const
+int QxQuickHeaderSection::row() const
 {
     return m_row;
 }
 
-void QxHeaderSection::setRow(int newRow)
+void QxQuickHeaderSection::setRow(int newRow)
 {
     if (m_row == newRow)
         return;
@@ -71,12 +71,12 @@ void QxHeaderSection::setRow(int newRow)
     emit rowChanged();
 }
 
-int QxHeaderSection::column() const
+int QxQuickHeaderSection::column() const
 {
     return m_column;
 }
 
-void QxHeaderSection::setColumn(int newColumn)
+void QxQuickHeaderSection::setColumn(int newColumn)
 {
     if (m_column == newColumn)
         return;
@@ -84,12 +84,12 @@ void QxHeaderSection::setColumn(int newColumn)
     emit columnChanged();
 }
 
-int QxHeaderSection::columnSpan() const
+int QxQuickHeaderSection::columnSpan() const
 {
     return m_columnSpan;
 }
 
-void QxHeaderSection::setColumnSpan(int newColumnSpan)
+void QxQuickHeaderSection::setColumnSpan(int newColumnSpan)
 {
     if (m_columnSpan == newColumnSpan)
         return;
@@ -97,12 +97,12 @@ void QxHeaderSection::setColumnSpan(int newColumnSpan)
     emit columnSpanChanged();
 }
 
-int QxHeaderSection::rowSpan() const
+int QxQuickHeaderSection::rowSpan() const
 {
     return m_rowSpan;
 }
 
-void QxHeaderSection::setRowSpan(int newRowSpan)
+void QxQuickHeaderSection::setRowSpan(int newRowSpan)
 {
     if (m_rowSpan == newRowSpan)
         return;
@@ -110,12 +110,12 @@ void QxHeaderSection::setRowSpan(int newRowSpan)
     emit rowSpanChanged();
 }
 
-const QList<QxHeaderSection *> &QxHeaderSection::sections() const
+const QList<QxQuickHeaderSection *> &QxQuickHeaderSection::sections() const
 {
     return m_sections;
 }
 
-void QxHeaderSection::resize()
+void QxQuickHeaderSection::resize()
 {
     int new_size = 0;
 
@@ -126,7 +126,7 @@ void QxHeaderSection::resize()
     setWidth(new_size);
 }
 
-QxHeaderSection *QxHeaderSection::findFirstLeafSection()
+QxQuickHeaderSection *QxQuickHeaderSection::findFirstLeafSection()
 {
     if (sections().isEmpty()) {
         return this;
@@ -141,7 +141,7 @@ QxHeaderSection *QxHeaderSection::findFirstLeafSection()
     return section;
 }
 
-void QxHeaderSection::invalidate()
+void QxQuickHeaderSection::invalidate()
 {
     if (isLeaf()) {
         setColumnSpan(1);        
@@ -185,17 +185,17 @@ void QxHeaderSection::invalidate()
     emit depthChanged();
 }
 
-QxHeaderSection *QxHeaderSection::parentSection() const
+QxQuickHeaderSection *QxQuickHeaderSection::parentSection() const
 {
     return m_parentSection;
 }
 
-void QxHeaderSection::setParentSection(QxHeaderSection *newSectionParent)
+void QxQuickHeaderSection::setParentSection(QxQuickHeaderSection *newSectionParent)
 {
     m_parentSection = newSectionParent;
 }
 
-QxHeaderSection *QxHeaderSection::rootSection() const
+QxQuickHeaderSection *QxQuickHeaderSection::rootSection() const
 {
     auto p = parentSection();
 
@@ -206,12 +206,12 @@ QxHeaderSection *QxHeaderSection::rootSection() const
     return p;
 }
 
-qreal QxHeaderSection::width() const
+qreal QxQuickHeaderSection::width() const
 {
     return m_width;
 }
 
-void QxHeaderSection::setWidth(qreal newWidth)
+void QxQuickHeaderSection::setWidth(qreal newWidth)
 {
     if (m_width == newWidth) {
         return;
@@ -222,17 +222,17 @@ void QxHeaderSection::setWidth(qreal newWidth)
     emit widthChanged();
 }
 
-bool QxHeaderSection::isLeaf() const
+bool QxQuickHeaderSection::isLeaf() const
 {
     return m_sections.empty();
 }
 
-int QxHeaderSection::leafCount() const
+int QxQuickHeaderSection::leafCount() const
 {
     return leafs().size();
 }
 
-int QxHeaderSection::depth() const
+int QxQuickHeaderSection::depth() const
 {
     int depth = 0;
 
@@ -246,9 +246,9 @@ int QxHeaderSection::depth() const
     return depth;
 }
 
-int QxHeaderSection::maxChildrenDepth() const
+int QxQuickHeaderSection::maxChildrenDepth() const
 {
-    std::function<void(const QxHeaderSection *, int &)> tree_visitor = [&tree_visitor](const QxHeaderSection *section, int &depth) {
+    std::function<void(const QxQuickHeaderSection *, int &)> tree_visitor = [&tree_visitor](const QxQuickHeaderSection *section, int &depth) {
         ++depth;
 
         for (int i = 0; i < section->sections().size(); ++i) {
@@ -263,11 +263,11 @@ int QxHeaderSection::maxChildrenDepth() const
     return res;
 }
 
-QList<QxHeaderSection *> QxHeaderSection::leafs() const
+QList<QxQuickHeaderSection *> QxQuickHeaderSection::leafs() const
 {
-    QList<QxHeaderSection *> result;
+    QList<QxQuickHeaderSection *> result;
 
-    std::function<void(const QList<QxHeaderSection *> &)> tree_visitor = [&tree_visitor, &result](const QList<QxHeaderSection *> &sections) {
+    std::function<void(const QList<QxQuickHeaderSection *> &)> tree_visitor = [&tree_visitor, &result](const QList<QxQuickHeaderSection *> &sections) {
         for (int i = 0; i < sections.size(); ++i) {
             auto s = sections.at(i);
 
@@ -285,10 +285,10 @@ QList<QxHeaderSection *> QxHeaderSection::leafs() const
     return result;
 }
 
-QList<QxHeaderSection *> QxHeaderSection::depthSections(int depth) const
+QList<QxQuickHeaderSection *> QxQuickHeaderSection::depthSections(int depth) const
 {
-    QList<QxHeaderSection *> res;
-    std::function<void(const QList<QxHeaderSection *> &, QList<QxHeaderSection *> &)> tree_visitor = [&tree_visitor, depth](const QList<QxHeaderSection *> &sections, QList<QxHeaderSection *> &container) {
+    QList<QxQuickHeaderSection *> res;
+    std::function<void(const QList<QxQuickHeaderSection *> &, QList<QxQuickHeaderSection *> &)> tree_visitor = [&tree_visitor, depth](const QList<QxQuickHeaderSection *> &sections, QList<QxQuickHeaderSection *> &container) {
         for (int i = 0; i < sections.size(); ++i) {
             auto s = sections.at(i);
 
@@ -306,12 +306,12 @@ QList<QxHeaderSection *> QxHeaderSection::depthSections(int depth) const
     return res;
 }
 
-const QString &QxHeaderSection::title() const
+const QString &QxQuickHeaderSection::title() const
 {
     return m_title;
 }
 
-void QxHeaderSection::setTitle(const QString &newTitle)
+void QxQuickHeaderSection::setTitle(const QString &newTitle)
 {
     if (m_title == newTitle) {
         return;
