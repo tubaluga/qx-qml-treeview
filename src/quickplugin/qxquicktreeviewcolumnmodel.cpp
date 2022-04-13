@@ -51,3 +51,8 @@ void QxQuickTreeViewColumnModel::setColumnWidth(int index, qreal width)
         emit dataChanged(model_index, model_index, { Qt::DisplayRole });
     }
 }
+
+const QList<qreal> &QxQuickTreeViewColumnModel::items() const
+{
+    return m_items;
+}

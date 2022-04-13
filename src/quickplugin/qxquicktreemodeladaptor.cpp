@@ -1,5 +1,7 @@
 #include "qxquicktreemodeladaptor.h"
 
+#include <cmath>
+
 #include <QDebug>
 #include <QStack>
 
@@ -770,7 +772,7 @@ void QxQuickTreeModelAdaptor::dump() const
     int count = m_items.count();
     if (count == 0)
         return;
-    int countWidth = floor(log10(double(count))) + 1;
+    int countWidth = std::floor(std::log10(double(count))) + 1;
     qInfo() << "Dumping" << this;
     for (int i = 0; i < count; i++) {
         const TreeItem &item = m_items.at(i);

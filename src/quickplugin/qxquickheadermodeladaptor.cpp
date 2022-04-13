@@ -51,17 +51,19 @@ void QxQuickHeaderModelAdaptor::setSections(const QList<QxQuickHeaderSection *> 
 
     tree_visitor(m_root);
 
+    m_leafSections = m_root->leafs();
+
     foreach (const auto &connection, m_connections) {
         disconnect(connection);
     }
 
-    foreach (auto column_section, m_root->leafs()) {
+    foreach (auto column_section, m_leafSections) {
         m_connections << connect(column_section, &QxQuickHeaderSection::widthChanged, this, [column_section, this]() {
             emit sectionWidthChanged(column_section->column(), column_section->width());
         });
     }
 
-    setSectionColumnCount(root()->leafCount());
+    setSectionColumnCount(m_leafSections.size());
     setSectionRowCount(root()->maxChildrenDepth());
 
     invalidate();
@@ -85,31 +87,35 @@ QVariant QxQuickHeaderModelAdaptor::data(const QModelIndex &index, int role) con
 
     auto section = m_sections.at(index.row());
 
-    if (role == Title) {
+    switch (role) {
+    case Title:
         return section->title();
-    }
-    else if (role == ColSpan) {
+    case ColSpan:
         return section->columnSpan();
-    }
-    else if (role == RowSpan) {
+    case RowSpan:
         return section->rowSpan();
-    }
-    else if (role == Column) {
+    case Column:
         return section->column();
-    }
-    else if (role == HeaderSection) {
+    case HeaderSection:
         return QVariant::fromValue(section);
-    }
-    else if (role == IsLeaf) {
+    case IsLeaf:
         return section->isLeaf();
-    }
+    default:
+        if (m_source.isNull()) {
+            return QVariant();
+        }
 
-    return QVariant();
+        return m_source->data(section->index(), role);
+    }
 }
 
 QHash<int, QByteArray> QxQuickHeaderModelAdaptor::roleNames() const
 {
-    QHash<int, QByteArray> roles;
+    if (m_source.isNull()) {
+        return QHash<int, QByteArray>();
+    }
+
+    QHash<int, QByteArray> roles = m_source->roleNames();
 
     roles.insert(Role::Title, "adaptor_title");
     roles.insert(Role::ColSpan, "adaptor_col_span");
@@ -134,7 +140,7 @@ void QxQuickHeaderModelAdaptor::invalidate()
 }
 
 int QxQuickHeaderModelAdaptor::sectionColumn(QxQuickHeaderSection *section) const
-{
+{ 
     int depth = section->depth();
 
     int column = 0;
@@ -174,9 +180,7 @@ void QxQuickHeaderModelAdaptor::onSourceModelChanged(QAbstractItemModel *new_mod
 
 void QxQuickHeaderModelAdaptor::updateColumnSize()
 {
-    auto leaf_sections = root()->leafs();
-
-    foreach (auto leaf, leaf_sections) {
+    foreach (auto leaf, m_leafSections) {
         emit sectionWidthChanged(leaf->column(), leaf->width());
     }
 }
@@ -223,10 +227,8 @@ void QxQuickHeaderModelAdaptor::setColumnsWidth(qreal width)
 
 void QxQuickHeaderModelAdaptor::setColumnWidth(int section, qreal width)
 {
-    auto leaf_sections = root()->leafs();
-
-    if (section > -1 && section < leaf_sections.size()) {
-        leaf_sections.at(section)->setWidth(width);
+    if (section > -1 && section < m_leafSections.size()) {
+        m_leafSections.at(section)->setWidth(width);
     }
 }
 

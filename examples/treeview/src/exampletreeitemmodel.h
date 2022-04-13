@@ -28,7 +28,8 @@ public:
 
 public:
     enum Roles {
-        Title = Qt::UserRole + 1
+        Title = Qt::UserRole + 1,
+        CountMessages
     };
 
     Q_ENUM(Roles)

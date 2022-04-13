@@ -28,6 +28,12 @@ public:
 
     QxQuickTreeModelAdaptor *adaptor() const;
 
+    Q_INVOKABLE void expand(int row);
+    Q_INVOKABLE void expandAll();
+    Q_INVOKABLE bool isExpanded(int row) const;
+
+    Q_INVOKABLE void collapse(int row);
+
 protected:
     void invalidate();
 
@@ -37,6 +43,7 @@ private:
 
 signals:
     void modelChanged();
+    void requestResizeColumns();
 };
 
 Q_DECLARE_METATYPE(QxQuickTreeViewTemplate *)

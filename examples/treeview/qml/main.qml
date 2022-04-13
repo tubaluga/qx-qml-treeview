@@ -1,3 +1,4 @@
+import QtQml 2.0
 import QtQuick 2.11
 import QtQuick.Layouts 1.0
 import QtQuick.Controls 2.2
@@ -13,6 +14,8 @@ ApplicationWindow {
     title: Qt.application.displayName
     visible: true
 
+
+
     ExampleTreeItemModel {
         id: example_model
 
@@ -27,6 +30,8 @@ ApplicationWindow {
 
         clip: true
 
+        Component.onCompleted: tree_view.expandAll()
+
         background: Rectangle {
             color: '#ffffff'
         }
@@ -38,17 +43,42 @@ ApplicationWindow {
                 color: isHovered ? '#f9fafc' : 'transparent'
             }
 
-            contentItem: Text {
-                padding: 16
-                text: !!modelData.displayText ? modelData.displayText : ''
-                width: parent.width
-                elide: Text.ElideRight
-                color: '#69707a'
+            contentItem: RowLayout {
+                Component {
+                    id: decorator_component
+
+                    Image {
+                        id: decorator
+                        source: 'qrc:/media/arrow_right_black_24dp.svg'
+
+                        rotation: isExpanded ? 90 : 0
+                        visible: hasChildren
+
+                        Behavior on rotation {
+                            NumberAnimation { duration: 100 }
+                        }
+                    }
+
+                }
+
+                Loader {
+                    sourceComponent: columnIndex === 0 ? decorator_component : null
+                    Layout.leftMargin: 12 * itemDepth
+                    visible: sourceComponent
+                }
+
+                Text {
+                    padding: 16
+                    text: !!modelData.displayText ? modelData.displayText : ''
+                    Layout.fillWidth: true
+                    elide: Text.ElideRight
+                    color: '#69707a'
+                }
             }
         }
 
         header: QxHorizontalHeaderView {
-            columnsWidth: control.width / columnCount
+            columnsWidth: tree_view.width / columnCount
 
             width: tree_view.width
 

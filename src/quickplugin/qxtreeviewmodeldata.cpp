@@ -35,14 +35,15 @@ void QxTreeViewModelData::update()
     const auto model = m_modelIndex.model();
 
     if (model != nullptr) {
-        auto data  = model->itemData(m_modelIndex);
         auto names = model->roleNames();
 
         model_data.insert("displayText", m_modelIndex.data());
 
-        for (auto i = data.begin(); i != data.end(); ++i) {
-            if (names.contains(i.key())) {
-                model_data.insert(names.value(i.key()), i.value());
+        for (auto i = names.begin(); i != names.end(); ++i) {
+            auto value = m_modelIndex.data(i.key());
+
+            if (!value.isNull()) {
+                model_data.insert(i.value(), value);
             }
         }
     }

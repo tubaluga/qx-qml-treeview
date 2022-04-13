@@ -20,6 +20,8 @@ QVariant TreeItemModel::data(const QModelIndex &index, int role) const
     }
     case Title:
         return item->title;
+    case CountMessages:
+        return 10;
     default:
         break;
     }
@@ -67,6 +69,7 @@ QHash<int, QByteArray> TreeItemModel::roleNames() const
     QHash<int, QByteArray> roles;
 
     roles.insert(Title, QByteArrayLiteral("title"));
+    roles.insert(CountMessages, QByteArrayLiteral("count_messages"));
 
     return roles;
 }

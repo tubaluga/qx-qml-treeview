@@ -19,13 +19,13 @@ class QxQuickHeaderModelAdaptor : public QAbstractListModel {
 
 public:
     enum Role {
-        Title         = Qt::DisplayRole,
-        RowSpan       = Qt::UserRole + 1,
-        ColSpan       = Qt::UserRole + 2,
-        Column        = Qt::UserRole + 3,
-        Row           = Qt::UserRole + 4,
-        HeaderSection = Qt::UserRole + 5,
-        IsLeaf        = Qt::UserRole + 6
+        Title   = Qt::DisplayRole,
+        RowSpan = Qt::UserRole - 6,
+        ColSpan,
+        Column,
+        Row,
+        HeaderSection,
+        IsLeaf
     };
 
     Q_ENUM(Role)
@@ -74,6 +74,7 @@ private:
     QPointer<QAbstractItemModel> m_source;
     QxQuickHeaderSection *m_root;
     QList<QxQuickHeaderSection *> m_sections;
+    QList<QxQuickHeaderSection *> m_leafSections;
     QList<QMetaObject::Connection> m_connections;
     int m_sectionColumnCount = 0;
     int m_sectionRowCount    = 0;

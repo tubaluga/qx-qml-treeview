@@ -58,6 +58,19 @@ void QxQuickHeaderSection::clearSections(QQmlListProperty<QxQuickHeaderSection> 
     reinterpret_cast<QxQuickHeaderSection *>(list->data)->clearSections();
 }
 
+const QPersistentModelIndex &QxQuickHeaderSection::index() const
+{
+    return m_index;
+}
+
+void QxQuickHeaderSection::setIndex(const QPersistentModelIndex &newIndex)
+{
+    if (m_index == newIndex)
+        return;
+    m_index = newIndex;
+    emit indexChanged();
+}
+
 int QxQuickHeaderSection::row() const
 {
     return m_row;
@@ -213,7 +226,7 @@ qreal QxQuickHeaderSection::width() const
 
 void QxQuickHeaderSection::setWidth(qreal newWidth)
 {
-    if (m_width == newWidth) {
+    if (qFuzzyCompare(m_width, newWidth)) {
         return;
     }
 
