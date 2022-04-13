@@ -45,12 +45,14 @@ QxHorizontalHeaderViewTemplate {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
 
+
                 Loader {
                     id: delegate_loader
                     anchors.fill: parent
                     sourceComponent: control.delegate
 
                     property QtObject sectionData: adaptor_section
+                    property var modelData: model
 
                     onLoaded: {
                         if (adaptor_section.width === -1) {

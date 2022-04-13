@@ -1,6 +1,8 @@
 #include "qxquicktreeviewtemplate.h"
 #include "qxquicktreemodeladaptor.h"
 
+#include <QDebug>
+
 QxQuickTreeViewTemplate::QxQuickTreeViewTemplate(QQuickItem *parent) :
     QQuickItem{ parent }, m_columnModel(new QxQuickTreeViewColumnModel(this))
 {
@@ -25,7 +27,7 @@ void QxQuickTreeViewTemplate::setModel(QAbstractItemModel *newModel)
     m_adaptor->setModel(newModel);
 
     if (m_adaptor->model()) {
-        connect(m_adaptor->model(), &QAbstractItemModel::modelReset, this, &QxQuickTreeViewTemplate::invalidate);
+        connect(m_adaptor->model(), &QAbstractItemModel::modelReset, this, &QxQuickTreeViewTemplate::invalidate);        
     }
 
     invalidate();
@@ -34,7 +36,7 @@ void QxQuickTreeViewTemplate::setModel(QAbstractItemModel *newModel)
 }
 
 void QxQuickTreeViewTemplate::setColumnWidth(int column, qreal width)
-{    
+{
     m_columnModel->setColumnWidth(column, width);
 }
 
@@ -51,11 +53,48 @@ void QxQuickTreeViewTemplate::invalidate()
     }
 
     m_columnModel->setItems(column_items);
+
+    emit requestResizeColumns();
 }
 
 QxQuickTreeModelAdaptor *QxQuickTreeViewTemplate::adaptor() const
 {
     return m_adaptor;
+}
+
+void QxQuickTreeViewTemplate::expand(int row)
+{
+    m_adaptor->expand(m_adaptor->mapRowToModelIndex(row));
+}
+
+void QxQuickTreeViewTemplate::collapse(int row)
+{
+    m_adaptor->collapse(m_adaptor->mapRowToModelIndex(row));
+}
+
+bool QxQuickTreeViewTemplate::isExpanded(int row) const
+{
+    return m_adaptor->isExpanded(m_adaptor->mapRowToModelIndex(row));
+}
+
+void QxQuickTreeViewTemplate::expandAll()
+{
+    if (!m_adaptor->model()) {
+        return;
+    }
+
+    std::function<void(const QModelIndex &)> expand_function = [this, &expand_function](const QModelIndex &parent) {
+        for (int row = 0; row < m_adaptor->model()->rowCount(parent); ++row) {
+            auto model_index = m_adaptor->model()->index(row, 0, parent);
+
+            if (model_index.isValid()) {
+                m_adaptor->expand(model_index);
+                expand_function(model_index);
+            }
+        }
+    };
+
+    expand_function(QModelIndex());
 }
 
 QxQuickTreeViewColumnModel *QxQuickTreeViewTemplate::columnModel() const

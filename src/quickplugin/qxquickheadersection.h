@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QObject>
+#include <QPersistentModelIndex>
 #include <QQmlListProperty>
 
 class QxQuickHeaderSection : public QObject {
@@ -15,6 +16,7 @@ class QxQuickHeaderSection : public QObject {
     Q_PROPERTY(int column READ column WRITE setColumn NOTIFY columnChanged)
     Q_PROPERTY(int row READ row WRITE setRow NOTIFY rowChanged)
     Q_PROPERTY(QQmlListProperty<QxQuickHeaderSection> sections READ sectionListProperty CONSTANT)
+    Q_PROPERTY(QPersistentModelIndex index READ index WRITE setIndex NOTIFY indexChanged)
 
 public:
     explicit QxQuickHeaderSection(QObject *parent = nullptr);
@@ -61,6 +63,9 @@ public:
 
     void invalidate();
 
+    const QPersistentModelIndex &index() const;
+    void setIndex(const QPersistentModelIndex &newIndex);
+
 protected:
     void resize();
     QxQuickHeaderSection *findFirstLeafSection();
@@ -74,6 +79,8 @@ signals:
     void rowChanged();
     void isLeafChanged();
     void depthChanged();
+
+    void indexChanged();
 
 private:
     static void appendSection(QQmlListProperty<QxQuickHeaderSection> *, QxQuickHeaderSection *);
@@ -90,6 +97,7 @@ private:
     int m_columnSpan                 = 1;
     QxQuickHeaderSection *m_parentSection = nullptr;
     QList<QxQuickHeaderSection *> m_sections;
+    QPersistentModelIndex m_index;
 };
 
 Q_DECLARE_METATYPE(QxQuickHeaderSection *)

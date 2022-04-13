@@ -22,13 +22,11 @@ public:
         }
 
         adaptor_connections << QObject::connect(adaptor, &QxQuickHeaderModelAdaptor::sectionColumnCountChanged, q_ptr, [this]() {
-            q_ptr->setColumnCount(adaptor->sectionColumnCount());
-            updateDefaultColumnWidth();
+            q_ptr->setColumnCount(adaptor->sectionColumnCount());            
         });
 
         adaptor_connections << QObject::connect(adaptor, &QxQuickHeaderModelAdaptor::sectionRowCountChanged, q_ptr, [this]() {
-            q_ptr->setRowCount(adaptor->sectionRowCount());
-            updateDefaultColumnWidth();
+            q_ptr->setRowCount(adaptor->sectionRowCount());            
         });
     }
 
@@ -40,6 +38,10 @@ public:
 
         view_connections << QObject::connect(sync_view, &QxQuickTreeViewTemplate::modelChanged, q_ptr, [this]() {
             setSyncViewModel();
+        });
+
+        view_connections << QObject::connect(sync_view, &QxQuickTreeViewTemplate::requestResizeColumns, q_ptr, [this]() {
+            syncSectionWidth();
         });
     }
 
@@ -53,7 +55,6 @@ public:
                 adaptor->setSource(sync_view->model());
             }
 
-            updateDefaultColumnWidth();
             syncSectionWidth();
         }
     }
@@ -67,24 +68,12 @@ public:
         }
     }
 
-    void updateDefaultColumnWidth()
-    {
-        /*static qreal minimum_width = 25.;
-
-        if (q_ptr->columnCount() == 0) {
-            q_ptr->setDefaultColumnWidth(250);
-        }
-        else {
-            q_ptr->setDefaultColumnWidth(qMax(q_ptr->width() / q_ptr->columnCount(), minimum_width));
-        }*/
-    }
-
     QxQuickHeaderModelAdaptor *adaptor         = nullptr;
     QxQuickHorizontalHeaderViewTemplate *q_ptr = nullptr;
     int row_count                         = 0;
     int column_count                      = 0;
     QPointer<QxQuickTreeViewTemplate> sync_view;
-    qreal default_column_width = 250;
+    qreal columns_width = 250;
     QVector<QMetaObject::Connection> adaptor_connections;
     QVector<QMetaObject::Connection> view_connections;
     QVector<QMetaObject::Connection> header_view_connections;
@@ -103,6 +92,9 @@ QxQuickHorizontalHeaderViewTemplate::~QxQuickHorizontalHeaderViewTemplate()
 
 void QxQuickHorizontalHeaderViewTemplate::setupModel(QAbstractItemModel *new_model, QAbstractItemModel *old_model)
 {
+    Q_UNUSED(new_model)
+    Q_UNUSED(old_model)
+
     auto tree_adaptor = new QxQuickHeaderTreeModelAdaptor(this);
 
     tree_adaptor->setSource(model());
@@ -159,23 +151,21 @@ void QxQuickHorizontalHeaderViewTemplate::setAdaptor(QxQuickHeaderModelAdaptor *
         if (syncView()) {
             syncView()->setColumnWidth(section, width);
         }
-    });
-
-    d_ptr->updateDefaultColumnWidth();
+    });    
 }
 
 qreal QxQuickHorizontalHeaderViewTemplate::columnsWidth() const
 {
-    return d_ptr->default_column_width;
+    return d_ptr->columns_width;
 }
 
 void QxQuickHorizontalHeaderViewTemplate::setColumnsWidth(qreal newDefaultColumnWidth)
 {
-    if (d_ptr->default_column_width == newDefaultColumnWidth) {
+    if (d_ptr->columns_width == newDefaultColumnWidth) {
         return;
     }
 
-    d_ptr->default_column_width = newDefaultColumnWidth;
+    d_ptr->columns_width = newDefaultColumnWidth;
 
     if (d_ptr->adaptor) {
         d_ptr->adaptor->setSectionDefaultWidth(newDefaultColumnWidth);
@@ -203,8 +193,6 @@ void QxQuickHorizontalHeaderViewTemplate::setSyncView(QxQuickTreeViewTemplate *n
     }
 
     d_ptr->sync_view = newSyncView;
-
-    d_ptr->updateDefaultColumnWidth();
 
     d_ptr->setSyncViewModel();
 

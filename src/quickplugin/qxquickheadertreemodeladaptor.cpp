@@ -26,6 +26,7 @@ void QxQuickHeaderTreeModelAdaptor::createSectionsByRow(QList<QxQuickHeaderSecti
 
         QxQuickHeaderSection *section = new QxQuickHeaderSection(parent_section);
         section->setTitle(model->data(child_index).toString());
+        section->setIndex(child_index);
 
         m_sectionCache.insert(child_index, section);
 

@@ -10,21 +10,6 @@ QxTreeViewTemplate {
     property alias header: list_view.header    
     property alias background: background_loader.sourceComponent
 
-    function expand(index) {
-        var model_index = adaptor.mapRowToModelIndex(index)
-        adaptor.expand(model_index)
-    }
-
-    function collapse(index) {
-        var model_index = adaptor.mapRowToModelIndex(index)
-        adaptor.collapse(model_index)
-    }
-
-    function isExpanded(index) {
-        var model_index = adaptor.mapRowToModelIndex(index)
-        return adaptor.isExpanded(model_index)
-    }
-
     Loader {
         id: background_loader
         anchors.fill: parent
@@ -47,9 +32,6 @@ QxTreeViewTemplate {
 
             onImplicitWidthChanged: list_view.contentWidth = implicitWidth
         }
-
-        /*ScrollBar.vertical: ScrollBar {
-        }*/
 
         ScrollBar.horizontal: ScrollBar {
         }

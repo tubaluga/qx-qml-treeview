@@ -12,6 +12,7 @@ public:
     QHash<int, QByteArray> roleNames() const override;
 
     void setItems(const QList<qreal> &items);
+    const QList<qreal> &items() const;
 
     void setColumnWidth(int index, qreal width);
 

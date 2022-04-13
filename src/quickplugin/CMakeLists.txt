@@ -1,6 +1,6 @@
 project(qx-qml-treeview-quickplugin)
 
-find_package(Qt5 REQUIRED COMPONENTS Core Qml Quick QuickControls2)
+find_package(Qt5 REQUIRED COMPONENTS Core Qml Quick)
 
 add_library(${PROJECT_NAME} SHARED)
 
@@ -72,11 +72,8 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 target_link_libraries(${PROJECT_NAME} PRIVATE
 		Qt5::Core
 		Qt5::Qml
-		Qt5::Quick		
-		Qt5::QuickPrivate
-		Qt5::QuickControls2
-		Qt5::QuickControls2Private
-	)
+		Qt5::Quick
+)
 
 set(MODULE_DIR share/imports/Qx/treeview/)
 
