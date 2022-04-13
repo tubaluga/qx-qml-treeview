@@ -49,21 +49,6 @@ endif()
 
 add_definitions(-DQT_PLUGIN)
 
-#include(QmlPlugin)
-
-#FindQmlPluginDump()
-
-#set(GENERATE_QMLTYPES_COMMAND ${QMLPLUGINDUMP_BIN} -nonrelocatable "Qx.treeview" "1.0" "${OUTPUT_DIR}/${QX_BIN_DIR}" > ${CMAKE_CURRENT_BINARY_DIR}/plugin.qmltypes)
-
-#message("${GENERATE_QMLTYPES_COMMAND}")
-
-#add_custom_command(
-#            TARGET ${PROJECT_NAME}
-#                POST_BUILD
-#                COMMAND ${GENERATE_QMLTYPES_COMMAND}
-#                COMMENT "Generating plugin.qmltypes"
-#                )
-
 target_include_directories(${PROJECT_NAME} PUBLIC
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/>
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/>
